@@ -7,8 +7,10 @@ import java.time.LocalDate;
  * @project springbasegymcrm
  */
 public class Training {
+    private long trainingId;
     private Trainee traineeId;
-    private Trainer trainingName;
+    private Trainer trainerId;
+    private String trainingName;
     private TrainingType type;
     private LocalDate trainingDate;
     private int trainingDuration;
@@ -16,8 +18,11 @@ public class Training {
     public Training() {
     }
 
-    public Training(Trainee traineeId, Trainer trainingName, TrainingType type, LocalDate trainingDate, int trainingDuration) {
+    public Training(long trainingId, Trainee traineeId, Trainer trainerId, String trainingName, TrainingType type,
+                    LocalDate trainingDate, int trainingDuration) {
+        this.trainingId = trainingId;
         this.traineeId = traineeId;
+        this.trainerId = trainerId;
         this.trainingName = trainingName;
         this.type = type;
         this.trainingDate = trainingDate;
@@ -32,11 +37,19 @@ public class Training {
         this.traineeId = traineeId;
     }
 
-    public Trainer getTrainingName() {
+    public Trainer getTrainerId() {
+        return trainerId;
+    }
+
+    public void setTrainerId(Trainer trainerId) {
+        this.trainerId = trainerId;
+    }
+
+    public String getTrainingName() {
         return trainingName;
     }
 
-    public void setTrainingName(Trainer trainingName) {
+    public void setTrainingName(String trainingName) {
         this.trainingName = trainingName;
     }
 
