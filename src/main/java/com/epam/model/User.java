@@ -6,7 +6,7 @@ package com.epam.model;
  */
 public abstract class User {
 
-    private String userId;
+    private long userId;
     private String firstName;
     private String lastName;
     private String userName;
@@ -16,7 +16,8 @@ public abstract class User {
     public User() {
     }
 
-    public User(String userId, String firstName, String lastName, String userName, String password, boolean isActive) {
+    public User(long userId, String firstName, String lastName, String userName, String password,
+                boolean isActive) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -25,11 +26,11 @@ public abstract class User {
         this.isActive = isActive;
     }
 
-    public String getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
