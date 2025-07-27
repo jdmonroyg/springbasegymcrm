@@ -1,8 +1,10 @@
 package com.epam.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
  * @author jdmon on 25/07/2025
@@ -12,4 +14,9 @@ import org.springframework.context.annotation.PropertySource;
 @ComponentScan(basePackages = "com.epam")
 @PropertySource("classpath:application.properties")
 public class ApplicationConfig {
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfig(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 }
