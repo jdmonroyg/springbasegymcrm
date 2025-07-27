@@ -8,8 +8,8 @@ import java.time.LocalDate;
  */
 public class Training {
     private long trainingId;
-    private Trainee traineeId;
-    private Trainer trainerId;
+    private long traineeId;
+    private long trainerId;
     private String trainingName;
     private TrainingType type;
     private LocalDate trainingDate;
@@ -18,7 +18,7 @@ public class Training {
     public Training() {
     }
 
-    public Training(long trainingId, Trainee traineeId, Trainer trainerId, String trainingName, TrainingType type,
+    public Training(long trainingId, long traineeId, long trainerId, String trainingName, TrainingType type,
                     LocalDate trainingDate, int trainingDuration) {
         this.trainingId = trainingId;
         this.traineeId = traineeId;
@@ -29,19 +29,27 @@ public class Training {
         this.trainingDuration = trainingDuration;
     }
 
-    public Trainee getTraineeId() {
+    public long getTrainingId() {
+        return trainingId;
+    }
+
+    public void setTrainingId(long trainingId) {
+        this.trainingId = trainingId;
+    }
+
+    public long getTraineeId() {
         return traineeId;
     }
 
-    public void setTraineeId(Trainee traineeId) {
+    public void setTraineeId(long traineeId) {
         this.traineeId = traineeId;
     }
 
-    public Trainer getTrainerId() {
+    public long getTrainerId() {
         return trainerId;
     }
 
-    public void setTrainerId(Trainer trainerId) {
+    public void setTrainerId(long trainerId) {
         this.trainerId = trainerId;
     }
 
