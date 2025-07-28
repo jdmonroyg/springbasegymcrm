@@ -1,7 +1,7 @@
-package com.epam.dao;
+package com.epam.dao.imp;
 
+import com.epam.dao.BaseDao;
 import com.epam.model.Training;
-import com.epam.model.User;
 import com.epam.storage.TrainingStorage;
 import org.springframework.stereotype.Repository;
 
@@ -12,11 +12,9 @@ import java.util.List;
  * @project springbasegymcrm
  */
 @Repository
-public class TrainingDao implements BaseDao<Training>{
+public class TrainingDao implements BaseDao<Training> {
 
-    private static final String NAMESPACE = "training";
-
-    private TrainingStorage storage;
+    private final TrainingStorage storage;
 
     public TrainingDao(TrainingStorage storage) {
         this.storage = storage;

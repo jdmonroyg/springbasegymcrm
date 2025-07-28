@@ -1,5 +1,6 @@
-package com.epam.dao;
+package com.epam.dao.imp;
 
+import com.epam.dao.BaseDao;
 import com.epam.model.Trainee;
 import com.epam.model.User;
 import com.epam.storage.TraineeStorage;
@@ -12,7 +13,7 @@ import java.util.List;
  * @project springbasegymcrm
  */
 @Repository
-public class TraineeDao implements BaseDao<Trainee>{
+public class TraineeDao implements BaseDao<Trainee> {
 
     private final TraineeStorage storage;
 
