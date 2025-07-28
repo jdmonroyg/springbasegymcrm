@@ -1,5 +1,7 @@
 package com.epam.storage;
 
+import com.epam.model.Training;
+import com.epam.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -44,7 +46,12 @@ public class DataInitializer {
             data.getTrainers().forEach(trainer ->
                     trainerStorage.getTrainerMap().put(trainer.getUserId(),trainer));
             data.getTrainings().forEach(training ->
-                    trainingStorage.getTrainingeMap().put(training.getTrainingId(),training));
+                    trainingStorage.getTrainingMap().put(training.getTrainingId(),training));
+
+            User.initializeNextId(Math.max(data.getTrainees().stream().mapToLong(User::getUserId).max().orElse(0),
+            data.getTrainers().stream().mapToLong(User::getUserId).max().orElse(0)));
+
+            Training.initializeNextId(data.getTrainings().stream().mapToLong(Training::getTrainingId).max().orElse(0));
 
             System.out.println("The data was fully loaded");
 

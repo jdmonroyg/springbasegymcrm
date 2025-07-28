@@ -13,6 +13,8 @@ public abstract class User {
     private String password;
     private boolean isActive;
 
+    private static long nextId;
+
     public User() {
     }
 
@@ -24,6 +26,16 @@ public abstract class User {
         this.userName = userName;
         this.password = password;
         this.isActive = isActive;
+    }
+
+    public static long generateNextId() {
+        return ++nextId;
+    }
+
+    public static void initializeNextId(long maxExistingId) {
+        if (maxExistingId > nextId) {
+            nextId = maxExistingId;
+        }
     }
 
     public long getUserId() {

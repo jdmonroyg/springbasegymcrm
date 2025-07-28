@@ -29,7 +29,7 @@ public class Main {
         traineeStorage.getTraineeMap().forEach((key, trainee) ->
                 System.out.println("key: "+key+" Value: "+trainee));
 
-        trainingStorage.getTrainingeMap().forEach((key, training)->
+        trainingStorage.getTrainingMap().forEach((key, training)->
                 System.out.println("key: "+key+" Value: "+training));
 
 

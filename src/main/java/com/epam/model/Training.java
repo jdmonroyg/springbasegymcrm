@@ -15,6 +15,8 @@ public class Training {
     private LocalDate trainingDate;
     private int trainingDuration;
 
+    private static long nextId;
+
     public Training() {
     }
 
@@ -27,6 +29,16 @@ public class Training {
         this.type = type;
         this.trainingDate = trainingDate;
         this.trainingDuration = trainingDuration;
+    }
+
+    public static long generateNextId() {
+        return ++nextId;
+    }
+
+    public static void initializeNextId(long maxExistingId) {
+        if (maxExistingId > nextId) {
+            nextId = maxExistingId;
+        }
     }
 
     public long getTrainingId() {
