@@ -1,6 +1,7 @@
 package com.epam.dao;
 
 import com.epam.model.Trainee;
+import com.epam.model.User;
 import com.epam.storage.TraineeStorage;
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +14,6 @@ import java.util.List;
 @Repository
 public class TraineeDao implements BaseDao<Trainee>{
 
-    private static final String NAMESPACE = "trainee";
-
     private final TraineeStorage storage;
 
     public TraineeDao(TraineeStorage storage) {
@@ -23,27 +22,31 @@ public class TraineeDao implements BaseDao<Trainee>{
 
     @Override
     public void save(Trainee entity) {
-
-
+        storage.getTraineeMap().put(User.generateNextId(),entity);
     }
 
     @Override
     public Trainee findById(long id) {
-        return null;
+        return storage.getTraineeMap().get(id);
     }
 
     @Override
     public List<Trainee> findAll() {
-        return List.of();
+        return storage.getTraineeMap().values()
+                .stream().filter(User::isActive).toList();
     }
 
     @Override
     public void update(Trainee entity) {
-
+        if(storage.getTraineeMap().containsKey(entity.getUserId())){
+            storage.getTraineeMap().put(entity.getUserId(),entity);
+        }else storage.getTraineeMap().put(User.generateNextId(),entity);
     }
 
     @Override
     public void deletedById(long id) {
-
+        Trainee traineeToDeleted= storage.getTraineeMap().get(id);
+        traineeToDeleted.setActive(false);
+        update(traineeToDeleted);
     }
 }

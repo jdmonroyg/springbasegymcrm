@@ -14,7 +14,7 @@ import java.util.Map;
 public class TrainingStorage {
     private final Map<Long, Training> trainingMap = new HashMap<>();
 
-    public Map<Long, Training> getTrainingeMap(){
+    public Map<Long, Training> getTrainingMap(){
         return trainingMap;
     }
 
