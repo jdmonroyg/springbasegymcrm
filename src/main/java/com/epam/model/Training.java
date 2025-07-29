@@ -13,7 +13,7 @@ public class Training {
     private String trainingName;
     private TrainingType type;
     private LocalDate trainingDate;
-    private int trainingDuration;
+    private int durationInMinutes;
 
     private static long nextId;
 
@@ -21,14 +21,14 @@ public class Training {
     }
 
     public Training(long trainingId, long traineeId, long trainerId, String trainingName, TrainingType type,
-                    LocalDate trainingDate, int trainingDuration) {
+                    LocalDate trainingDate, int durationInMinutes) {
         this.trainingId = trainingId;
         this.traineeId = traineeId;
         this.trainerId = trainerId;
         this.trainingName = trainingName;
         this.type = type;
         this.trainingDate = trainingDate;
-        this.trainingDuration = trainingDuration;
+        this.durationInMinutes = durationInMinutes;
     }
 
     public static long generateNextId() {
@@ -89,11 +89,24 @@ public class Training {
         this.trainingDate = trainingDate;
     }
 
-    public int getTrainingDuration() {
-        return trainingDuration;
+    public int getDurationInMinutes() {
+        return durationInMinutes;
     }
 
-    public void setTrainingDuration(int trainingDuration) {
-        this.trainingDuration = trainingDuration;
+    public void setDurationInMinutes(int durationInMinutes) {
+        this.durationInMinutes = durationInMinutes;
+    }
+
+    @Override
+    public String toString() {
+        return "Training{" +
+                "trainingId=" + trainingId +
+                ", traineeId=" + traineeId +
+                ", trainerId=" + trainerId +
+                ", trainingName='" + trainingName + '\'' +
+                ", type=" + type +
+                ", trainingDate=" + trainingDate +
+                ", durationInMinutes=" + durationInMinutes +
+                '}';
     }
 }
