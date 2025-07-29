@@ -1,6 +1,6 @@
-package com.epam.dao.imp;
+package com.epam.dao.impl;
 
-import com.epam.dao.BaseDao;
+import com.epam.dao.TrainingDao;
 import com.epam.model.Training;
 import com.epam.storage.TrainingStorage;
 import org.springframework.stereotype.Repository;
@@ -12,11 +12,11 @@ import java.util.List;
  * @project springbasegymcrm
  */
 @Repository
-public class TrainingDao implements BaseDao<Training> {
+public class TrainingDaoImpl implements TrainingDao {
 
     private final TrainingStorage storage;
 
-    public TrainingDao(TrainingStorage storage) {
+    public TrainingDaoImpl(TrainingStorage storage) {
         this.storage = storage;
     }
 
@@ -36,15 +36,4 @@ public class TrainingDao implements BaseDao<Training> {
                 .stream().toList();
     }
 
-    @Override
-    public void update(Training entity) {
-        if(storage.getTrainingMap().containsKey(entity.getTrainingId())){
-            storage.getTrainingMap().put(entity.getTrainingId(),entity);
-        }else storage.getTrainingMap().put(Training.generateNextId(),entity);
-    }
-
-    @Override
-    public void deletedById(long id) {
-        storage.getTrainingMap().remove(id);
-    }
 }
