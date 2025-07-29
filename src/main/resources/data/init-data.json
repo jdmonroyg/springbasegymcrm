@@ -49,7 +49,7 @@
       "trainingName": "Cardio Session",
       "type": "CARDIO",
       "trainingDate": "2024-07-25",
-      "trainingDuration": 60
+      "durationInMinutes": 60
     }
   ]
 }
