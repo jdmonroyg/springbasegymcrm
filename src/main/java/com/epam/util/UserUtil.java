@@ -1,9 +1,13 @@
 package com.epam.util;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -12,6 +16,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class UserUtil {
+
+    private Set<String> userNames = new HashSet<>();
 
     public String generateRandomPassword(){
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -36,5 +42,13 @@ public class UserUtil {
 
     private String capitalize(String name) {
         return Character.toUpperCase(name.charAt(0)) + name.substring(1).toLowerCase();
+    }
+
+    public void addUsernames(String username){
+        userNames.add(username);
+    }
+
+    public List<String> getUserNames() {
+        return new ArrayList<>(userNames);
     }
 }

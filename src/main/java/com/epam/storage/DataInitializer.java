@@ -2,10 +2,12 @@ package com.epam.storage;
 
 import com.epam.model.Training;
 import com.epam.model.User;
+import com.epam.util.UserUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,11 +28,18 @@ public class DataInitializer {
     private final TrainerStorage trainerStorage;
     private final TrainingStorage trainingStorage;
 
+    private UserUtil userUtil;
+
     public DataInitializer(TraineeStorage traineeStorage,
                            TrainerStorage trainerStorage, TrainingStorage trainingStorage) {
         this.traineeStorage = traineeStorage;
         this.trainerStorage = trainerStorage;
         this.trainingStorage = trainingStorage;
+    }
+
+    @Autowired
+    public void setUserUtil(UserUtil userUtil){
+        this.userUtil=userUtil;
     }
 
     @PostConstruct
@@ -41,10 +50,14 @@ public class DataInitializer {
             mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             InitData data= mapper.readValue(is, InitData.class);
 
-            data.getTrainees().forEach(trainee ->
-                    traineeStorage.getTraineeMap().put(trainee.getUserId(),trainee));
-            data.getTrainers().forEach(trainer ->
-                    trainerStorage.getTrainerMap().put(trainer.getUserId(),trainer));
+            data.getTrainees().forEach(trainee ->{
+                traineeStorage.getTraineeMap().put(trainee.getUserId(),trainee);
+                userUtil.addUsernames(trainee.getUserName());
+            });
+            data.getTrainers().forEach(trainer ->{
+                trainerStorage.getTrainerMap().put(trainer.getUserId(),trainer);
+                userUtil.addUsernames(trainer.getUserName());
+            });
             data.getTrainings().forEach(training ->
                     trainingStorage.getTrainingMap().put(training.getTrainingId(),training));
 

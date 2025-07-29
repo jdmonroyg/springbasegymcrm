@@ -1,7 +1,6 @@
 package com.epam;
 
 import com.epam.config.ApplicationConfig;
-import com.epam.storage.DataInitializer;
 import com.epam.storage.TraineeStorage;
 import com.epam.storage.TrainerStorage;
 import com.epam.storage.TrainingStorage;
@@ -18,7 +17,6 @@ public class Main {
     public static void main(String[] args) {
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
 
-        DataInitializer init = context.getBean(DataInitializer.class);
         TraineeStorage traineeStorage = context.getBean(TraineeStorage.class);
         TrainerStorage trainerStorage = context.getBean(TrainerStorage.class);
         TrainingStorage trainingStorage = context.getBean(TrainingStorage.class);
@@ -31,8 +29,6 @@ public class Main {
 
         trainingStorage.getTrainingMap().forEach((key, training)->
                 System.out.println("key: "+key+" Value: "+training));
-
-
 
 
 
