@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,8 @@ public class DataInitializer {
 
     private UserUtil userUtil;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataInitializer.class);
+
     public DataInitializer(TraineeStorage traineeStorage,
                            TrainerStorage trainerStorage, TrainingStorage trainingStorage) {
         this.traineeStorage = traineeStorage;
@@ -50,6 +54,8 @@ public class DataInitializer {
             mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             InitData data= mapper.readValue(is, InitData.class);
 
+            LOGGER.info("Initial loading has started for storages");
+
             data.getTrainees().forEach(trainee ->{
                 traineeStorage.getTraineeMap().put(trainee.getUserId(),trainee);
                 userUtil.addUsernames(trainee.getUserName());
@@ -66,10 +72,10 @@ public class DataInitializer {
 
             Training.initializeNextId(data.getTrainings().stream().mapToLong(Training::getTrainingId).max().orElse(0));
 
-            System.out.println("The data was fully loaded");
+            LOGGER.info("The data was fully loaded");
 
         } catch (IOException e){
-            System.err.println("Error in initialization data: " + e.getMessage());
+            LOGGER.error("Error in initialization data: {} ",e.getMessage());
         }
     }
 }
