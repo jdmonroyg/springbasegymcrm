@@ -8,7 +8,7 @@ principles of software modularity and testability.
 
 - Registering **Trainees**, and **Trainers**
 - Registering **Trainings** between **Trainees** and **Trainers** 
-- Searching all or by ID for apprentices, trainers, and trainings
+- Searching all or by ID for trainees, trainers, and trainings
 - Automatically loading data-init from a JSON file
 
 ## 🛠 Stack
@@ -61,7 +61,6 @@ if you meet the installation requirements
 - git clone https://github.com/jdmonroyg/springbasegymcrm.git
 - cd springbasegymcrm
 - mvn clean install
-- test
 
-## 🎥 Demo Video (Coming Soon)
-A video demonstration will be available soon on YouTube.
+## 🎥 Demo Video 
+- [GYM CRM VIDEO](https://youtu.be/zxblcQZWv-8)
