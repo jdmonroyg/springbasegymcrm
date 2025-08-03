@@ -38,6 +38,10 @@ public abstract class User {
         }
     }
 
+    public static void setNextId(long nextId) {
+        User.nextId = nextId;
+    }
+
     public long getUserId() {
         return userId;
     }

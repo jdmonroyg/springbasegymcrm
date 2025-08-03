@@ -6,10 +6,7 @@ import com.epam.dao.TrainingDao;
 import com.epam.dao.impl.TraineeDaoImpl;
 import com.epam.dao.impl.TrainerDaoImpl;
 import com.epam.dao.impl.TrainingDaoImpl;
-import com.epam.model.Trainee;
-import com.epam.model.Trainer;
-import com.epam.model.Training;
-import com.epam.model.TrainingType;
+import com.epam.model.*;
 import com.epam.service.TrainingService;
 import com.epam.service.impl.TraineeServiceImpl;
 import com.epam.service.impl.TrainerServiceImpl;
@@ -49,6 +46,8 @@ class PortalGymFacadeTest {
 
         //Util
         UserUtil userUtil = new UserUtil();
+        User.setNextId(0);
+        Training.setNextId(0);
 
         //Service
         TraineeServiceImpl traineeService = new TraineeServiceImpl(traineeDao);
@@ -74,16 +73,16 @@ class PortalGymFacadeTest {
         List<Trainee> trainees = portalGymFacade.selectAllTrainees();
 
         assertEquals(4,trainees.size());
-        Trainee trainee3 = portalGymFacade.selectTrainee(7);
+        Trainee trainee3 = portalGymFacade.selectTrainee(3);
         assertEquals("Jesus.Monroy2",trainee3.getUserName());
 
-        portalGymFacade.updatedTrainee(7,LocalDate.of(1995,2,1),"Street 7c #22c - 23");
-        trainee3 = portalGymFacade.selectTrainee(7);
+        portalGymFacade.updatedTrainee(3,LocalDate.of(1995,2,1),"Street 7c #22c - 23");
+        trainee3 = portalGymFacade.selectTrainee(3);
 
         assertEquals("Street 7c #22c - 23",trainee3.getAddress());
 
-        Trainee trainee2 = portalGymFacade.selectTrainee(6);
-        portalGymFacade.deleteTrainee(6);
+        Trainee trainee2 = portalGymFacade.selectTrainee(2);
+        portalGymFacade.deleteTrainee(2);
         assertFalse(trainee2.isActive());
 
         portalGymFacade.createTrainer("Daniel", "Monroy","zumba");
@@ -92,19 +91,19 @@ class PortalGymFacadeTest {
         List<Trainer> trainers = portalGymFacade.selectAllTrainers();
         assertEquals(3,trainers.size());
 
-        portalGymFacade.updatedTrainer(11,"PILATES");
-        Trainer trainer7 = portalGymFacade.selectTrainer(11);
+        portalGymFacade.updatedTrainer(7,"PILATES");
+        Trainer trainer7 = portalGymFacade.selectTrainer(7);
         assertEquals(TrainingType.PILATES, trainer7.getSpecialization());
 
 
-        portalGymFacade.createTraining(5, 9, "Colombian Zumba",
+        portalGymFacade.createTraining(1, 5, "Colombian Zumba",
                 "zumba", LocalDate.of(2025,8,2),60);
-        portalGymFacade.createTraining(8, 10, "Colombian Yoga",
+        portalGymFacade.createTraining(4, 6, "Colombian Yoga",
                 "yoga", LocalDate.of(2025,8,2),30);
         List<Training> trainings = portalGymFacade.selectAllTrainings();
         assertEquals(2, trainings.size());
-        Training training1 = portalGymFacade.selectTraining(2);
-        Training training2 = portalGymFacade.selectTraining(3);
+        Training training1 = portalGymFacade.selectTraining(1);
+        Training training2 = portalGymFacade.selectTraining(2);
         assertEquals("Colombian Zumba",training1.getTrainingName());
         assertEquals(TrainingType.ZUMBA,training1.getType());
 
