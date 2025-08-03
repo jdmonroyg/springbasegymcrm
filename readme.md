@@ -63,4 +63,4 @@ if you meet the installation requirements
 - mvn clean install
 
 ## 🎥 Demo Video 
-- [GYM CRM VIDEO](https://youtu.be/zxblcQZWv-8)
+- [GYM CRM VIDEO](https://youtu.be/o87Heqkcnlo)
