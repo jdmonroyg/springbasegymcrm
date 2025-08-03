@@ -41,6 +41,10 @@ public class Training {
         }
     }
 
+    public static void setNextId(long nextId) {
+        Training.nextId = nextId;
+    }
+
     public long getTrainingId() {
         return trainingId;
     }
