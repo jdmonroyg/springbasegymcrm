@@ -33,7 +33,7 @@
             <version>${spring.version}</version>
         </dependency>
 
-        <!--        Spring ORM: JPA + Transaction-->
+        <!-- Spring ORM: JPA + Transaction -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
@@ -84,7 +84,7 @@
             <version>1.5.18</version>
         </dependency>
 
-        <!--         Validation -->
+        <!-- Validation -->
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>

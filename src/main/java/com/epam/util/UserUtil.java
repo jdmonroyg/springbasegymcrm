@@ -1,10 +1,8 @@
 package com.epam.util;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
