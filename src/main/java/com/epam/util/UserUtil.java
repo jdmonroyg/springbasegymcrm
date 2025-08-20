@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * @author jdmon on 27/07/2025
@@ -20,16 +22,25 @@ public class UserUtil {
     private Set<String> userNames = new HashSet<>();
 
     public String generateRandomPassword(){
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         int passwordLength = 10;
         SecureRandom secureRandom = new SecureRandom();
-        return secureRandom.ints(passwordLength,0, characters.length())
-                .mapToObj(characters::charAt)
+        return secureRandom.ints(passwordLength,0, VALID_CHAR_CODES.size())
+                .mapToObj(VALID_CHAR_CODES::get)
+                .map(code -> (char) code.intValue())
                 .map(Object::toString)
                 .collect(Collectors.joining());
     }
 
-    public String generateUsername(String firstName, String lastName, List<String> existingUsernames){
+    private static final List<Integer> VALID_CHAR_CODES =
+            Stream.concat(
+                    IntStream.rangeClosed('0','9').boxed(),
+                    Stream.concat(
+                            IntStream.rangeClosed('A', 'Z').boxed(),
+                            IntStream.rangeClosed('a', 'z').boxed()
+                    )
+            ).toList();
+
+    public String generateUsername(String firstName, String lastName, Set<String> existingUsernames){
         String baseName = capitalize(firstName) + "." + capitalize(lastName);
         String username = baseName;
         int suffix=1;
@@ -48,7 +59,7 @@ public class UserUtil {
         userNames.add(username);
     }
 
-    public List<String> getUserNames() {
-        return new ArrayList<>(userNames);
+    public Set<String> getUserNames() {
+        return new HashSet<>(userNames);
     }
 }
