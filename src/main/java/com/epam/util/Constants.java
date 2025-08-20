@@ -2,7 +2,7 @@ package com.epam.util;
 
 /**
  * @author jdmon on 15/08/2025
- * @project jpagymcrm
+ * @project springbasegymcrm
  */
 public class Constants {
     public final static String INVALID_FIELD = "The field is required and must not be null or empty";
