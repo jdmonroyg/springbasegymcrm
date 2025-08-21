@@ -2,13 +2,15 @@ package com.epam.dao.impl;
 
 import com.epam.dao.TraineeDao;
 import com.epam.model.Trainee;
-import com.epam.model.User;
-import com.epam.storage.TraineeStorage;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jdmon on 26/07/2025
@@ -17,47 +19,34 @@ import java.util.List;
 @Repository
 public class TraineeDaoImpl implements TraineeDao {
 
-    private final TraineeStorage storage;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TraineeDaoImpl.class);
 
-    public TraineeDaoImpl(TraineeStorage storage) {
-        this.storage = storage;
+
+    @Override
+    public Trainee save(Trainee trainee) {
+        LOGGER.info("Saving trainee with username: {}", trainee.getUsername());
+        return entityManager.merge(trainee);
     }
 
     @Override
-    public void save(Trainee entity) {
-        LOGGER.info("Saving trainee with Id: {}", entity.getUserId());
-        storage.getTraineeMap().put(entity.getUserId(), entity);
-        LOGGER.info("Trainee saved successfully {}", entity.getUserName());
+    public Optional<Trainee> findByUsername(String username) {
+        LOGGER.info("selecting trainee with username: {}", username );
+        String jpql = "Select t from Trainee t where LOWER(t.username) = LOWER(:username)";
+        TypedQuery<Trainee> jpqlQuery = entityManager.createQuery(jpql, Trainee.class);
+        jpqlQuery.setParameter("username", username);
+        try {
+            return Optional.ofNullable(jpqlQuery.getSingleResult());
+        } catch (NoResultException ex){
+            return Optional.empty();
+        }
     }
 
     @Override
-    public Trainee findById(long id) {
-        LOGGER.info("selecting trainee with Id: {}", id );
-        return storage.getTraineeMap().get(id);
-    }
-
-    @Override
-    public List<Trainee> findAll() {
-        LOGGER.info("selecting all active trainees ");
-        return storage.getTraineeMap().values()
-                .stream().filter(User::isActive).toList();
-    }
-
-    @Override
-    public void update(Trainee entity) {
-        LOGGER.info("Updating trainee with Id: {}", entity.getUserId());
-        storage.getTraineeMap().put(entity.getUserId(),entity);
-        LOGGER.info("Trainee updated successfully {}", entity.getUserName());
-    }
-
-    @Override
-    public void deletedById(long id) {
-        LOGGER.info("Logical deleting trainee with Id: {}", id);
-        Trainee traineeToDeleted= storage.getTraineeMap().get(id);
-        traineeToDeleted.setActive(false);
-        storage.getTraineeMap().put(traineeToDeleted.getUserId(),traineeToDeleted);
-        LOGGER.info("Trainee logical deleting successfully {}", traineeToDeleted.getUserName());
+    public void deletedByUsername(Trainee trainee) {
+        LOGGER.info("Hard deleting trainee with username: {}", trainee.getUsername());
+        entityManager.remove(trainee);
     }
 }

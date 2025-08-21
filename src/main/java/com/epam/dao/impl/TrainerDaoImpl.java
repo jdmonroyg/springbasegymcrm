@@ -2,13 +2,16 @@ package com.epam.dao.impl;
 
 import com.epam.dao.TrainerDao;
 import com.epam.model.Trainer;
-import com.epam.model.User;
-import com.epam.storage.TrainerStorage;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jdmon on 26/07/2025
@@ -16,40 +19,37 @@ import java.util.List;
  */
 @Repository
 public class TrainerDaoImpl implements TrainerDao {
-
-    private final TrainerStorage storage;
+    @PersistenceContext
+    EntityManager entityManager;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainerDaoImpl.class);
 
-    public TrainerDaoImpl(TrainerStorage storage) {
-        this.storage = storage;
+    @Override
+    public Trainer save(Trainer trainer) {
+        LOGGER.info("Saving trainer with username: {}", trainer.getUsername());
+        return entityManager.merge(trainer);
     }
 
     @Override
-    public void save(Trainer entity) {
-        LOGGER.info("Saving trainer with Id: {}", entity.getUserId());
-        storage.getTrainerMap().put(entity.getUserId(),entity);
-        LOGGER.info("Trainer saved successfully {}", entity.getUserName());
+    public Optional<Trainer> findByUsername(String username) {
+        LOGGER.info("selecting trainer with username: {}", username );
+        String jpql = "Select t from Trainer t where LOWER(t.username) = LOWER(:username)";
+        TypedQuery<Trainer> jpqlQuery = entityManager.createQuery(jpql, Trainer.class);
+        jpqlQuery.setParameter("username", username);
+        try {
+            return Optional.ofNullable(jpqlQuery.getSingleResult());
+        } catch (NoResultException ex){
+            return Optional.empty();
+        }
     }
 
     @Override
-    public Trainer findById(long id) {
-        LOGGER.info("selecting trainer with Id: {}", id );
-        return storage.getTrainerMap().get(id);
+    public List<Trainer> findUnassignedTrainersByTraineeUsername(String traineeUsername) {
+        LOGGER.info("Find unassigned trainer by traineeUsername {}", traineeUsername );
+        String jpql = "Select tr From Trainer tr Where tr.id NOT IN " +
+                "(Select t.trainer.id From Training t Where LOWER(t.trainee.username) = LOWER(:username))";
+        TypedQuery<Trainer> jpqlQuery = entityManager.createQuery(jpql, Trainer.class);
+        jpqlQuery.setParameter("username", traineeUsername);
+        return jpqlQuery.getResultList();
     }
-
-    @Override
-    public List<Trainer> findAll() {
-        LOGGER.info("selecting all active trainers ");
-        return storage.getTrainerMap().values()
-                .stream().filter(User::isActive).toList();
-    }
-
-    @Override
-    public void update(Trainer entity) {
-        LOGGER.info("Updating trainer with Id: {}", entity.getUserId());
-        storage.getTrainerMap().put(entity.getUserId(),entity);
-        LOGGER.info("Trainer updated successfully {}", entity.getUserName());
-    }
-
 }

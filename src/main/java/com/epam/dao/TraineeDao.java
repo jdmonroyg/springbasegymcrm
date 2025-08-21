@@ -2,16 +2,16 @@ package com.epam.dao;
 
 import com.epam.model.Trainee;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jdmon on 26/07/2025
  * @project springbasegymcrm
  */
 public interface TraineeDao {
-    void save (Trainee trainee);
-    Trainee findById(long id);
-    List<Trainee> findAll();
-    void update(Trainee trainee);
-    void deletedById(long id);
+    Trainee save(Trainee trainee);
+
+    Optional<Trainee> findByUsername(String username);
+
+    void deletedByUsername(Trainee trainee);
 }
