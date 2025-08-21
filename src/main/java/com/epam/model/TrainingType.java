@@ -65,7 +65,7 @@ public class TrainingType {
     @Override
     public String toString() {
         return  ", trainingTypeId=" + id +
-                ", name='" + name
+                ", name='" + name + '\''
                 ;
     }
 }

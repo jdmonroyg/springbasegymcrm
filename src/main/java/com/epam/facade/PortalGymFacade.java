@@ -113,8 +113,6 @@ public class PortalGymFacade {
                                String username,
                                @Positive (message = INVALID_ID_VALUE)
                                Long specializationId){
-
-
         trainerService.updateTrainer(username, specializationId);
         LOGGER.info("A trainer was updated");
     }

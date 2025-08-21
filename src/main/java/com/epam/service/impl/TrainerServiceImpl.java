@@ -132,7 +132,7 @@ public class TrainerServiceImpl implements TrainerService {
     private Trainer getTrainerByUsername(String username) {
         return trainerDao.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException("Trainer was not found"));
+                        new IllegalArgumentException("Trainer was not found"));
     }
 
 }

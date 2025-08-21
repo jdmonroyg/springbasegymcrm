@@ -5,6 +5,7 @@ import com.epam.facade.PortalGymFacade;
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
 import com.epam.model.Training;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,10 @@ public class Main {
             PortalGymFacade portalGymFacade = ctx.getBean(PortalGymFacade.class);
 
             LOGGER.info("----- Creating Trainee with bad parameters -----");
-            portalGymFacade.createTrainee("", "",null,"");
+            try {
+                portalGymFacade.createTrainee("", "", null, "");
+            } catch (ConstraintViolationException ignored) {
+            }
 
             LOGGER.info("----- Creating two trainee with same names -----");
             portalGymFacade.createTrainee("Jesus", "Monroy",null,"");
@@ -40,7 +44,11 @@ public class Main {
 
             LOGGER.info("----- Creating two trainers, one with good parameters and one with bad parameters -----");
             portalGymFacade.createTrainer("Juan", "Moreno",2L);
-            portalGymFacade.createTrainer("Juan", "Moreno",8L);
+            try {
+                portalGymFacade.createTrainer("Juan", "Moreno",8L);
+            } catch (IllegalArgumentException ignored){
+            }
+
 
             LOGGER.info("----- Selecting a trainee juan.moreno -----");
             Trainer trainer1 = portalGymFacade.selectTrainerByUsername("juan.moreno");
@@ -87,9 +95,6 @@ public class Main {
                     "juan.moreno", "Cardio Class", 2L,
                     LocalDate.of(2025, 8, 23), 38);
 
-//            LOGGER.info("----- Deleting a trainee with two trainings (1, 2) -----");
-//            portalGymFacade.deleteTrainee("isabel.miranda");
-
             LOGGER.info("----- Getting trainings for isabel.miranda -----");
             List<Training> traineeTrainings = portalGymFacade.getTraineeTrainings("isabel.miranda",null,
                     null,null,null);
@@ -105,8 +110,11 @@ public class Main {
             portalGymFacade.deleteTrainee("isabel.miranda");
 
             LOGGER.info("----- Receiving training from the deleted Trainee Isabel.miranda -----");
-            portalGymFacade.getTraineeTrainings("isabel.miranda",null,
-                    null,null,null);
+            try {
+                portalGymFacade.getTraineeTrainings("isabel.miranda",null,
+                        null,null,null);
+            } catch (IllegalArgumentException ignored){
+            }
 
             LOGGER.info("----- Getting the trainers not assigned to the Trainee jesus.monroy -----");
             List<Trainer> unassignedTrainers = portalGymFacade.getUnassignedTrainersByTraineeUsername("Jesus.monroy");

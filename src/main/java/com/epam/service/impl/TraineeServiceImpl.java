@@ -123,7 +123,7 @@ public class TraineeServiceImpl implements TraineeService {
     private Trainee getTraineeByUsername(String username) {
         return traineeDao.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException("Trainee was not found"));
+                        new IllegalArgumentException("Trainee was not found"));
 
     }
 }
