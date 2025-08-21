@@ -84,4 +84,4 @@ if you meet the installation requirements
 
 ## 🎥 Demo Video 
 - [GYM CRM VIDEO V1](https://youtu.be/o87Heqkcnlo)
-- [GYM CRM VIDEO V2](https://youtu.be/o87Heqkcnlo)
+- [GYM CRM VIDEO V2](https://youtu.be/w2W7PWNIXQg)
