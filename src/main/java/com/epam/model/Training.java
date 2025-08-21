@@ -1,72 +1,77 @@
 package com.epam.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
 /**
  * @author jdmon on 25/07/2025
  * @project springbasegymcrm
  */
+@Entity
+@Table(name = "trainings")
 public class Training {
-    private long trainingId;
-    private long traineeId;
-    private long trainerId;
-    private String trainingName;
-    private TrainingType type;
-    private LocalDate trainingDate;
-    private int durationInMinutes;
 
-    private static long nextId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long Id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trainee_id", nullable = false)
+    private Trainee trainee;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trainer_id", nullable = false)
+    private Trainer trainer;
+
+    @Column(name = "training_name", nullable = false)
+    private String trainingName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "training_type_id", nullable = false)
+    private TrainingType trainingType;
+
+    @Column(name = "training_date", nullable = false)
+    private LocalDate trainingDate;
+
+    @Column(name = "training_duration", nullable = false)
+    private int durationInMinutes;
 
     public Training() {
     }
 
-    public Training(long trainingId, long traineeId, long trainerId, String trainingName, TrainingType type,
-                    LocalDate trainingDate, int durationInMinutes) {
-        this.trainingId = trainingId;
-        this.traineeId = traineeId;
-        this.trainerId = trainerId;
+    public Training(Trainee trainee, Trainer trainer, String trainingName,
+                    TrainingType trainingType, LocalDate trainingDate, int durationInMinutes) {
+        this.trainee = trainee;
+        this.trainer = trainer;
         this.trainingName = trainingName;
-        this.type = type;
+        this.trainingType = trainingType;
         this.trainingDate = trainingDate;
         this.durationInMinutes = durationInMinutes;
     }
 
-    public static long generateNextId() {
-        return ++nextId;
+    public Long getId() {
+        return Id;
     }
 
-    public static void initializeNextId(long maxExistingId) {
-        if (maxExistingId > nextId) {
-            nextId = maxExistingId;
-        }
+    public void setId(Long id) {
+        Id = id;
     }
 
-    public static void setNextId(long nextId) {
-        Training.nextId = nextId;
+    public Trainee getTrainee() {
+        return trainee;
     }
 
-    public long getTrainingId() {
-        return trainingId;
+    public void setTrainee(Trainee trainee) {
+        this.trainee = trainee;
     }
 
-    public void setTrainingId(long trainingId) {
-        this.trainingId = trainingId;
+    public Trainer getTrainer() {
+        return trainer;
     }
 
-    public long getTraineeId() {
-        return traineeId;
-    }
-
-    public void setTraineeId(long traineeId) {
-        this.traineeId = traineeId;
-    }
-
-    public long getTrainerId() {
-        return trainerId;
-    }
-
-    public void setTrainerId(long trainerId) {
-        this.trainerId = trainerId;
+    public void setTrainer(Trainer trainer) {
+        this.trainer = trainer;
     }
 
     public String getTrainingName() {
@@ -77,12 +82,12 @@ public class Training {
         this.trainingName = trainingName;
     }
 
-    public TrainingType getType() {
-        return type;
+    public TrainingType getTrainingType() {
+        return trainingType;
     }
 
-    public void setType(TrainingType type) {
-        this.type = type;
+    public void setTrainingType(TrainingType trainingType) {
+        this.trainingType = trainingType;
     }
 
     public LocalDate getTrainingDate() {
@@ -104,13 +109,13 @@ public class Training {
     @Override
     public String toString() {
         return "Training{" +
-                "trainingId=" + trainingId +
-                ", traineeId=" + traineeId +
-                ", trainerId=" + trainerId +
+                "trainee=" + trainee +
+                ", trainer=" + trainer +
                 ", trainingName='" + trainingName + '\'' +
-                ", type=" + type +
+                ", trainingType=" + trainingType +
                 ", trainingDate=" + trainingDate +
                 ", durationInMinutes=" + durationInMinutes +
+                ", Id=" + Id +
                 '}';
     }
 }
