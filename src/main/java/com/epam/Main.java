@@ -50,7 +50,7 @@ public class Main {
             }
 
 
-            LOGGER.info("----- Selecting a trainee juan.moreno -----");
+            LOGGER.info("----- Selecting a trainer juan.moreno -----");
             Trainer trainer1 = portalGymFacade.selectTrainerByUsername("juan.moreno");
 
             LOGGER.info("----- Login for a trainee and a trainer -----");
