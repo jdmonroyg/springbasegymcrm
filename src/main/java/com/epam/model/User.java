@@ -1,53 +1,56 @@
 package com.epam.model;
 
+import jakarta.persistence.*;
+
+import java.io.Serializable;
+
 /**
  * @author jdmon on 25/07/2025
  * @project springbasegymcrm
  */
-public abstract class User {
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class User implements Serializable {
 
-    private long userId;
-    private String firstName;
-    private String lastName;
-    private String userName;
-    private String password;
-    private boolean isActive;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    protected Long Id;
 
-    private static long nextId;
+    @Column(name = "first_name", nullable = false)
+    protected String firstName;
 
-    public User() {
+    @Column(name = "last_name", nullable = false)
+    protected String lastName;
+
+    @Column(nullable = false, unique = true)
+    protected String username;
+
+    @Column(nullable = false)
+    protected String password;
+
+    @Column(nullable = false)
+    protected Boolean isActive;
+
+    protected User() {
     }
 
-    public User(long userId, String firstName, String lastName, String userName, String password,
-                boolean isActive) {
-        this.userId = userId;
+    protected User(String firstName, String lastName, String username,
+                String password, Boolean isActive) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.userName = userName;
+        this.username = username;
         this.password = password;
         this.isActive = isActive;
     }
 
-    public static long generateNextId() {
-        return ++nextId;
+    public Long getId() {
+        return Id;
     }
 
-    public static void initializeNextId(long maxExistingId) {
-        if (maxExistingId > nextId) {
-            nextId = maxExistingId;
-        }
-    }
-
-    public static void setNextId(long nextId) {
-        User.nextId = nextId;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setId(Long id) {
+        Id = id;
     }
 
     public String getFirstName() {
@@ -66,12 +69,12 @@ public abstract class User {
         this.lastName = lastName;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -82,21 +85,20 @@ public abstract class User {
         this.password = password;
     }
 
-    public boolean isActive() {
+    public Boolean getActive() {
         return isActive;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         isActive = active;
     }
 
     @Override
     public String toString() {
-        return  "userId=" + userId +
+        return "userId=" + Id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
-                ", isActive=" + isActive + '\'';
+                ", username='" + username + '\'' +
+                ", isActive=" + isActive;
     }
 }
