@@ -25,7 +25,7 @@ public class ServiceExceptionAspect {
             LOGGER.error("error in {} {}",
                     pjp.getTarget().getClass().getSimpleName(),
                     pjp.getSignature().getName(), re);
+            throw re;
         }
-        return null;
     }
 }

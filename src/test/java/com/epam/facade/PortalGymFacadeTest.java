@@ -1,114 +1,168 @@
 package com.epam.facade;
 
-import com.epam.dao.TraineeDao;
-import com.epam.dao.TrainerDao;
-import com.epam.dao.TrainingDao;
-import com.epam.dao.impl.TraineeDaoImpl;
-import com.epam.dao.impl.TrainerDaoImpl;
-import com.epam.dao.impl.TrainingDaoImpl;
+import com.epam.config.ApplicationConfig;
 import com.epam.model.*;
-import com.epam.service.TrainingService;
-import com.epam.service.impl.TraineeServiceImpl;
-import com.epam.service.impl.TrainerServiceImpl;
-import com.epam.service.impl.TrainingServiceImpl;
-import com.epam.storage.TraineeStorage;
-import com.epam.storage.TrainerStorage;
-import com.epam.storage.TrainingStorage;
-import com.epam.util.UserUtil;
-import org.junit.jupiter.api.BeforeEach;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author jdmon on 30/07/2025
  * @project springbasegymcrm
  */
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = ApplicationConfig.class)
 class PortalGymFacadeTest {
 
+    @Autowired
     private PortalGymFacade portalGymFacade;
 
-    @BeforeEach
-    void setup(){
-        //Storage
-        TraineeStorage traineeStorage = new TraineeStorage();
-        TrainerStorage trainerStorage = new TrainerStorage();
-        TrainingStorage trainingStorage = new TrainingStorage();
-
-
-        //Dao
-        TraineeDao traineeDao = new TraineeDaoImpl(traineeStorage);
-        TrainerDao trainerDao = new TrainerDaoImpl(trainerStorage);
-        TrainingDao trainingDao = new TrainingDaoImpl(trainingStorage);
-
-        //Util
-        UserUtil userUtil = new UserUtil();
-        User.setNextId(0);
-        Training.setNextId(0);
-
-        //Service
-        TraineeServiceImpl traineeService = new TraineeServiceImpl(traineeDao);
-        traineeService.setUserUtil(userUtil);
-        TrainerServiceImpl trainerService = new TrainerServiceImpl(trainerDao);
-        trainerService.setUserUtil(userUtil);
-        TrainingService trainingService = new TrainingServiceImpl(trainingDao,traineeService,trainerService);
-
-        portalGymFacade = new PortalGymFacade(traineeService,trainerService,trainingService);
+    @Test
+    void createTraineeWithBadCredentials(){
+        assertThrows(ConstraintViolationException.class,
+                () -> portalGymFacade
+                        .createTrainee("", "",null,""));
     }
-
 
     @Test
-    void createTraining() {
-        portalGymFacade.createTrainee("Jesus", "Monroy",
-                LocalDate.of(1993, 2,19),"Street 52c #85c - 20");
-        portalGymFacade.createTrainee("Jesus", "Monroy",
-                LocalDate.of(1994,8,1),"Street 72c #32c - 22");
-        portalGymFacade.createTrainee("Jesus", "Monroy",
-                LocalDate.of(1998,3,1),"Street 7c #82c - 20");
-        portalGymFacade.createTrainee("Pablo", "Chacon",
-                LocalDate.of(1984,2,1),"Street 7c #2c - 28");
-        List<Trainee> trainees = portalGymFacade.selectAllTrainees();
-
-        assertEquals(4,trainees.size());
-        Trainee trainee3 = portalGymFacade.selectTrainee(3);
-        assertEquals("Jesus.Monroy2",trainee3.getUserName());
-
-        portalGymFacade.updatedTrainee(3,LocalDate.of(1995,2,1),"Street 7c #22c - 23");
-        trainee3 = portalGymFacade.selectTrainee(3);
-
-        assertEquals("Street 7c #22c - 23",trainee3.getAddress());
-
-        Trainee trainee2 = portalGymFacade.selectTrainee(2);
-        portalGymFacade.deleteTrainee(2);
-        assertFalse(trainee2.isActive());
-
-        portalGymFacade.createTrainer("Daniel", "Monroy","zumba");
-        portalGymFacade.createTrainer("Juan", "Garzon","yoga");
-        portalGymFacade.createTrainer("Nestor", "Herrera","STRENGTH");
-        List<Trainer> trainers = portalGymFacade.selectAllTrainers();
-        assertEquals(3,trainers.size());
-
-        portalGymFacade.updatedTrainer(7,"PILATES");
-        Trainer trainer7 = portalGymFacade.selectTrainer(7);
-        assertEquals(TrainingType.PILATES, trainer7.getSpecialization());
-
-
-        portalGymFacade.createTraining(1, 5, "Colombian Zumba",
-                "zumba", LocalDate.of(2025,8,2),60);
-        portalGymFacade.createTraining(4, 6, "Colombian Yoga",
-                "yoga", LocalDate.of(2025,8,2),30);
-        List<Training> trainings = portalGymFacade.selectAllTrainings();
-        assertEquals(2, trainings.size());
-        Training training1 = portalGymFacade.selectTraining(1);
-        Training training2 = portalGymFacade.selectTraining(2);
-        assertEquals("Colombian Zumba",training1.getTrainingName());
-        assertEquals(TrainingType.ZUMBA,training1.getType());
-
-        assertEquals("Colombian Yoga",training2.getTrainingName());
-        assertEquals(TrainingType.YOGA,training2.getType());
-
+    void createTrainerWithBadCredentials(){
+        assertThrows(IllegalArgumentException.class,
+                () -> portalGymFacade
+                        .createTrainer("Juan", "Moreno",8L));
     }
+
+    @Test
+    void initialTraineeChangePasswordAndLogin(){
+        assertDoesNotThrow(() -> portalGymFacade
+                .authenticateTrainee("Isabel.Miranda", "Ducks12345"));
+
+        assertDoesNotThrow(() -> portalGymFacade
+                .changeTraineePassword("Isabel.Miranda","Ducks12345",
+                        "Dogs123456"));
+
+        assertDoesNotThrow(() -> portalGymFacade
+                .authenticateTrainee("Isabel.Miranda", "Dogs123456"));
+    }
+
+    @Test
+    void initialTrainerChangePasswordAndLogin(){
+        assertDoesNotThrow(() -> portalGymFacade
+                .authenticateTrainer("Pablo.Chacon", "Ducks12345"));
+
+        assertDoesNotThrow(() -> portalGymFacade
+                .changeTrainerPassword("Pablo.Chacon","Ducks12345",
+                        "Dogs123456"));
+
+        assertDoesNotThrow(() -> portalGymFacade
+                .authenticateTrainer("Pablo.Chacon", "Dogs123456"));
+    }
+
+    @Test
+    void updateInitialTrainer(){
+        Trainer tBefore = portalGymFacade.selectTrainerByUsername("Pablo.Chacon");
+        assertEquals("Pilates", tBefore.getSpecialization().getName());
+
+        assertDoesNotThrow(() -> portalGymFacade
+                .updatedTrainer("Pablo.Chacon", 6L));
+        Trainer tAfter = portalGymFacade.selectTrainerByUsername("Pablo.Chacon");
+
+        assertEquals("Zumba", tAfter.getSpecialization().getName());
+    }
+
+    @Test
+    void updateInitialTrainee(){
+        Trainee tBefore = portalGymFacade.selectTraineeByUsername("isabel.miranda");
+        assertNull(tBefore.getDateOfBirth());
+        assertNull(tBefore.getAddress());
+
+        assertDoesNotThrow(() -> portalGymFacade
+                .updatedTrainee("isabel.miranda",
+                        LocalDate.of(1991,1,17),
+                        "Street 52c # 25 - 02"));
+        Trainee tAfter = portalGymFacade.selectTraineeByUsername("isabel.miranda");
+
+        assertEquals(LocalDate.of(1991,1,17),
+                tAfter.getDateOfBirth());
+        assertEquals("Street 52c # 25 - 02",
+                tAfter.getAddress());
+    }
+
+    @Test
+    void initialTraineeToggleTraineeActiveStatus(){
+        assertTrue(portalGymFacade.selectTraineeByUsername("isabel.miranda").getActive());
+        assertDoesNotThrow(() -> portalGymFacade
+                .toggleTraineeActiveStatus("isabel.miranda"));
+        assertFalse(portalGymFacade.selectTraineeByUsername("isabel.miranda").getActive());
+        assertDoesNotThrow(() -> portalGymFacade
+                .toggleTraineeActiveStatus("isabel.miranda"));
+        assertTrue(portalGymFacade.selectTraineeByUsername("isabel.miranda").getActive());
+    }
+
+    @Test
+    void initialTrainerToggleTrainerActiveStatus(){
+        assertTrue(portalGymFacade.selectTrainerByUsername("pablo.chacon").getActive());
+        assertDoesNotThrow(() -> portalGymFacade
+                .toggleTrainerActiveStatus("pablo.chacon"));
+        assertFalse(portalGymFacade.selectTrainerByUsername("pablo.chacon").getActive());
+        assertDoesNotThrow(() -> portalGymFacade
+                .toggleTrainerActiveStatus("pablo.chacon"));
+        assertTrue(portalGymFacade.selectTrainerByUsername("pablo.chacon").getActive());
+    }
+
+    @Test
+    void createTrainingsAndGetTrainingByUsername(){
+        assertDoesNotThrow(
+                () -> portalGymFacade
+                        .createTrainee("Jesus", "Monroy",null,""));
+        assertDoesNotThrow(
+                () -> portalGymFacade
+                        .createTrainee("Jesus", "Monroy",null,""));
+        assertDoesNotThrow(
+                () -> portalGymFacade
+                        .createTrainer("Juan", "Moreno",2L));
+
+        assertDoesNotThrow(()->
+                portalGymFacade.createTraining("isabel.miranda",
+                "pablo.chacon", "Zumba Class", 6L,
+                LocalDate.of(2025, 8, 25), 40));
+
+        assertDoesNotThrow(()->
+                portalGymFacade.createTraining("isabel.miranda",
+                "juan.moreno", "Cardio Class", 2L,
+                LocalDate.of(2025, 8, 24), 55));
+
+        assertDoesNotThrow(()->
+                portalGymFacade.createTraining("Jesus.Monroy",
+                "juan.moreno", "Cardio Class", 2L,
+                LocalDate.of(2025, 8, 23), 38));
+
+        assertEquals(2, portalGymFacade.getTraineeTrainings("isabel.miranda", null,
+                null, null, null).size());
+
+        assertEquals(1, portalGymFacade.getTrainerTrainings("pablo.chacon", null,
+                null, null).size());
+
+        assertDoesNotThrow(()->
+                portalGymFacade.deleteTrainee("isabel.miranda"));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> portalGymFacade.getTraineeTrainings("isabel.miranda",null,
+                null,null,null));
+
+        List<Trainer> unassignedTrainers = portalGymFacade.getUnassignedTrainersByTraineeUsername("Jesus.monroy");
+        assertEquals(1, unassignedTrainers.size());
+
+        unassignedTrainers = portalGymFacade.getUnassignedTrainersByTraineeUsername("Jesus.monroy1");
+        assertEquals(2, unassignedTrainers.size());
+    }
+
+
 }
