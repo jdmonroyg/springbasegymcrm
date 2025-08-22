@@ -1,6 +1,10 @@
 package com.epam.service.impl;
 
+import com.epam.dao.TraineeDao;
+import com.epam.dao.TrainerDao;
 import com.epam.dao.TrainingDao;
+import com.epam.model.Trainee;
+import com.epam.model.Trainer;
 import com.epam.model.Training;
 import com.epam.service.TraineeService;
 import com.epam.service.TrainerService;
@@ -20,17 +24,16 @@ import java.time.LocalDate;
 @Service
 public class TrainingServiceImpl implements TrainingService {
     private final TrainingDao trainingDao;
-    private final TraineeService traineeService;
-    private final TrainerService trainerService;
+    private final TraineeDao traineeDao;
+    private final TrainerDao trainerDao;
     private final TrainingTypeService trainingTypeService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrainerServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
-    public TrainingServiceImpl(TrainingDao trainingDao, TraineeService traineeService,
-                               TrainerService trainerService, TrainingTypeService trainingTypeService) {
+    public TrainingServiceImpl(TrainingDao trainingDao, TraineeDao traineeDao, TrainerDao trainerDao, TrainingTypeService trainingTypeService) {
         this.trainingDao = trainingDao;
-        this.traineeService = traineeService;
-        this.trainerService = trainerService;
+        this.traineeDao = traineeDao;
+        this.trainerDao = trainerDao;
         this.trainingTypeService = trainingTypeService;
     }
 
@@ -38,11 +41,15 @@ public class TrainingServiceImpl implements TrainingService {
     @Transactional
     public void createTraining(String traineeUsername, String trainerUsername, String trainingName,
                                Long trainingType, LocalDate trainingDate, int durationInMinutes) {
-
-        Training trainingToSave = new Training(traineeService.selectTraineeByUsername(traineeUsername),
-                trainerService.selectTrainerByUsername(trainerUsername), trainingName,
+        Trainee trainee = traineeDao.findByUsername(traineeUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Trainee was not found"));
+        Trainer trainer = trainerDao.findByUsername(trainerUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Trainer was not found"));;
+        Training trainingToSave = new Training(trainee, trainer, trainingName,
                 trainingTypeService.selectTrainingTypeById(trainingType),trainingDate, durationInMinutes);
         trainingToSave = trainingDao.save(trainingToSave);
+        trainee.getTrainers().add(trainer);
+        traineeDao.save(trainee);
         LOGGER.debug("The {} was saved", trainingToSave);
     }
 }
