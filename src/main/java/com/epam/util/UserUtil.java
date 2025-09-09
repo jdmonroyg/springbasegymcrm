@@ -3,7 +3,6 @@ package com.epam.util;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,8 +15,6 @@ import java.util.stream.Stream;
  */
 @Component
 public class UserUtil {
-
-    private Set<String> userNames = new HashSet<>();
 
     public String generateRandomPassword(){
         int passwordLength = 10;
@@ -53,11 +50,4 @@ public class UserUtil {
         return Character.toUpperCase(name.charAt(0)) + name.substring(1).toLowerCase();
     }
 
-    public void addUsernames(String username){
-        userNames.add(username);
-    }
-
-    public Set<String> getUserNames() {
-        return new HashSet<>(userNames);
-    }
 }
