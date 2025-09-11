@@ -1,6 +1,6 @@
 package com.epam.service;
 
-import java.time.LocalDate;
+import com.epam.dto.request.CreateTrainingRequestDto;
 
 /**
  * @author jdmon on 17/08/2025
@@ -8,6 +8,5 @@ import java.time.LocalDate;
  */
 public interface TrainingService {
 
-    void createTraining(String traineeUsername, String trainerUsername, String trainingName,
-                        Long trainingType, LocalDate trainingDate, int durationInMinutes);
+    void createTraining(String token, CreateTrainingRequestDto requestDto);
 }

@@ -1,9 +1,14 @@
 package com.epam.service;
 
-import com.epam.model.Trainee;
-import com.epam.model.Training;
+import com.epam.dto.request.CreateTraineeRequestDto;
+import com.epam.dto.request.PatchUserRequestDto;
+import com.epam.dto.request.TraineeTrainingsFilterRequestDto;
+import com.epam.dto.request.UpdateTraineeRequestDto;
+import com.epam.dto.response.CreateUserResponseDto;
+import com.epam.dto.response.TraineeResponseDto;
+import com.epam.dto.response.TraineeUpdatedResponseDto;
+import com.epam.dto.response.TraineeTrainingsResponseDto;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -12,12 +17,11 @@ import java.util.List;
  */
 public interface TraineeService {
 
-    void createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address);
-    Trainee selectTraineeByUsername(String username);
-    void deleteTrainee(String username);
-    void changePassword(String username, String currentPassword, String newPassword);
-    void updateTrainee(String username, LocalDate dateOfBirth, String address);
-    void changeActiveStatus(String username);
-    List<Training> getTraineeTrainings(String username, LocalDate from, LocalDate to,
-                                       String trainerName, Long trainingTypeId);
+    CreateUserResponseDto createTrainee(CreateTraineeRequestDto traineeRequest);
+    TraineeResponseDto selectTraineeByUsername(String token, String username);
+    void deleteTrainee(String token, String username);
+    TraineeUpdatedResponseDto updateTrainee(String token, UpdateTraineeRequestDto traineeRequest);
+    void changeActiveStatus(String token, PatchUserRequestDto requestDto);
+    List<TraineeTrainingsResponseDto> getTraineeTrainings(String token, String username,
+                                                          TraineeTrainingsFilterRequestDto filterDto);
 }
