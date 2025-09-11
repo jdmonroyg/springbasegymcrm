@@ -32,9 +32,9 @@ public class Trainee extends User{
     public Trainee() {
     }
 
-    public Trainee(String firstName, String lastName, String username, String password,
-                   Boolean isActive, LocalDate dateOfBirth, String address) {
-        super(firstName, lastName, username, password, isActive);
+    public Trainee(String firstName, String lastName, String email, String username, String password,
+                   Boolean active, LocalDate dateOfBirth, String address) {
+        super(firstName, lastName, email, username, password, active);
         this.dateOfBirth = dateOfBirth;
         this.address = address;
     }

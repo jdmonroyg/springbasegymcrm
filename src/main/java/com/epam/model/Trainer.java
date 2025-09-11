@@ -27,9 +27,9 @@ public class Trainer extends User{
         super();
     }
 
-    public Trainer(String firstName, String lastName, String username,
-                   String password, Boolean isActive, TrainingType specialization) {
-        super(firstName, lastName, username, password, isActive);
+    public Trainer(String firstName, String lastName, String email, String username,
+                   String password, Boolean active, TrainingType specialization) {
+        super(firstName, lastName, email, username, password, active);
         this.specialization = specialization;
     }
 

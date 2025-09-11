@@ -25,24 +25,28 @@ public abstract class User implements Serializable {
     protected String lastName;
 
     @Column(nullable = false, unique = true)
+    protected String email;
+
+    @Column(nullable = false, unique = true)
     protected String username;
 
     @Column(nullable = false)
     protected String password;
 
     @Column(nullable = false)
-    protected Boolean isActive;
+    protected Boolean active;
 
     protected User() {
     }
 
-    protected User(String firstName, String lastName, String username,
-                String password, Boolean isActive) {
+    protected User(String firstName, String lastName, String email, String username,
+                   String password, Boolean active) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
         this.username = username;
         this.password = password;
-        this.isActive = isActive;
+        this.active = active;
     }
 
     public Long getId() {
@@ -86,11 +90,19 @@ public abstract class User implements Serializable {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(Boolean active) {
-        isActive = active;
+        this.active = active;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
@@ -99,6 +111,7 @@ public abstract class User implements Serializable {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
-                ", isActive=" + isActive;
+                ", email='" + email + '\'' +
+                ", isActive=" + active;
     }
 }
