@@ -1,10 +1,14 @@
 package com.epam.service;
 
+import com.epam.dto.request.UpdateLoginDto;
+
 /**
  * @author jdmon on 16/08/2025
  * @project springbasegymcrm
  */
 public interface AuthService {
-    void authenticateTrainee(String username, String rawPassword);
-    void authenticateTrainer(String username, String rawPassword);
+    String login(String username, String rawPassword);
+    void logout(String token);
+    void changePassword(String token, UpdateLoginDto updateLoginDto);
+    void validateAuthentication(String token);
 }

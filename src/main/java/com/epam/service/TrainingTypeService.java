@@ -1,6 +1,9 @@
 package com.epam.service;
 
+import com.epam.dto.response.TrainingsTypeResponseDto;
 import com.epam.model.TrainingType;
+
+import java.util.List;
 
 /**
  * @author jdmon on 16/08/2025
@@ -9,4 +12,8 @@ import com.epam.model.TrainingType;
 public interface TrainingTypeService {
 
     TrainingType selectTrainingTypeById(Long id);
+
+    List<TrainingsTypeResponseDto> getAllTrainingTypes(String token);
+
+
 }

@@ -1,8 +1,21 @@
 package com.epam.service.impl;
 
-import com.epam.dao.TraineeDao;
+import com.epam.dto.request.CreateTraineeRequestDto;
+import com.epam.dto.request.PatchUserRequestDto;
+import com.epam.dto.request.TraineeTrainingsFilterRequestDto;
+import com.epam.dto.request.UpdateTraineeRequestDto;
+import com.epam.dto.response.CreateUserResponseDto;
+import com.epam.dto.response.TraineeResponseDto;
+import com.epam.dto.response.TraineeUpdatedResponseDto;
+import com.epam.dto.response.TraineeTrainingsResponseDto;
+import com.epam.exception.EmailAlreadyExistsException;
+import com.epam.exception.NotFoundException;
+import com.epam.mapper.TraineeMapper;
+import com.epam.mapper.TrainingMapper;
 import com.epam.model.Trainee;
 import com.epam.model.Training;
+import com.epam.repository.TraineeRepository;
+import com.epam.repository.UserRepository;
 import com.epam.security.PasswordEncoder;
 import com.epam.service.AuthService;
 import com.epam.service.TraineeService;
@@ -12,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -22,91 +34,108 @@ import java.util.List;
 @Service
 public class TraineeServiceImpl implements TraineeService {
 
-    private final TraineeDao traineeDao;
+
+    private final TraineeRepository traineeRepository;
+    private final UserRepository userRepository;
     private final UserUtil userUtil;
     private final PasswordEncoder encoder;
+    private final TraineeMapper traineeMapper;
     private final AuthService authService;
+    private final TrainingMapper trainingMapper;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TraineeServiceImpl.class);
 
-    public TraineeServiceImpl(TraineeDao traineeDao, UserUtil userUtil, PasswordEncoder encoder, AuthService authService) {
-        this.traineeDao = traineeDao;
+    public TraineeServiceImpl(TraineeRepository trainerRepository, UserRepository userRepository, UserUtil userUtil, PasswordEncoder encoder, TraineeMapper traineeMapper, AuthService authService, TrainingMapper trainingMapper) {
+        this.traineeRepository = trainerRepository;
+        this.userRepository = userRepository;
         this.userUtil = userUtil;
         this.encoder = encoder;
+        this.traineeMapper = traineeMapper;
         this.authService = authService;
+        this.trainingMapper = trainingMapper;
     }
 
     @Override
     @Transactional
-    public void createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
-        String username = userUtil.generateUsername(firstName, lastName, userUtil.getUserNames());
-        Trainee trainee = new Trainee(firstName, lastName, username,
-                encoder.encode(userUtil.generateRandomPassword()),true, dateOfBirth, address );
-        trainee = traineeDao.save(trainee);
-        userUtil.addUsernames(trainee.getUsername());
-        LOGGER.debug("The {} was saved", trainee);
+    public CreateUserResponseDto createTrainee(CreateTraineeRequestDto dto) {
+        if (userRepository.findByEmail(dto.email()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email is already associated with an account");
+        }
+        String username = userUtil.generateUsername(dto.firstName(), dto.lastName(),
+                userRepository.findAllUsernames());
+        String firstPassword = userUtil.generateRandomPassword();
+        Trainee trainee = traineeMapper.createTraineeRequestDtoToTrainee(dto);
+        trainee.setUsername(username);
+        trainee.setPassword(encoder.encode(firstPassword));
+        trainee.setActive(true);
+        traineeRepository.save(trainee);
+        LOGGER.debug("The trainee {} was saved", username);
+        return new CreateUserResponseDto(username, firstPassword);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Trainee selectTraineeByUsername(String username) {
+    public TraineeResponseDto selectTraineeByUsername(String token, String username) {
+        authService.validateAuthentication(token);
         Trainee traineeSelected = getTraineeByUsername(username);
-        LOGGER.debug("The {} was select", traineeSelected);
-        return traineeSelected;
+        LOGGER.debug("The trainee {} was select", traineeSelected.getUsername());
+        return traineeMapper.traineeToTraineeResponseDto(traineeSelected);
     }
 
     @Override
     @Transactional
-    public void deleteTrainee(String username) {
+    public void deleteTrainee(String token, String username) {
+        authService.validateAuthentication(token);
         Trainee traineeToDeleted = getTraineeByUsername(username);
-        traineeDao.deletedByUsername(traineeToDeleted);
-        LOGGER.debug("The {} was deleted", traineeToDeleted);
+        traineeRepository.delete(traineeToDeleted);
+        LOGGER.debug("The trainee {} was deleted", traineeToDeleted.getUsername());
     }
 
     @Override
     @Transactional
-    public void changePassword(String username, String currentPassword, String newPassword) {
-        LOGGER.info("Initializing trainee login first");
-        authService.authenticateTrainee(username, currentPassword);
-        Trainee traineeToUpdate = selectTraineeByUsername(username);
-        traineeToUpdate.setPassword(encoder.encode(newPassword));
-        traineeDao.save(traineeToUpdate);
-        LOGGER.debug("The password for {} was changed", username);
+    public TraineeUpdatedResponseDto updateTrainee(String token, UpdateTraineeRequestDto dto) {
+        authService.validateAuthentication(token);
+        Trainee traineeToUpdated = getTraineeByUsername(dto.username());
+        traineeToUpdated.setFirstName(dto.firstName());
+        traineeToUpdated.setLastName(dto.lastName());
+        if (dto.dateOfBirth()!= null){
+            traineeToUpdated.setDateOfBirth(dto.dateOfBirth());
+        }
+        if(dto.address()!= null &&
+                !dto.address().isBlank()) {
+            traineeToUpdated.setAddress(dto.address());
+        }
+        traineeToUpdated.setActive(dto.active());
+        traineeRepository.save(traineeToUpdated);
+        LOGGER.debug("The trainee {} was updated", traineeToUpdated.getUsername());
+        return traineeMapper.traineeToTraineeUpdResponseDto(traineeToUpdated);
     }
 
     @Override
     @Transactional
-    public void updateTrainee(String username, LocalDate dateOfBirth, String address) {
-        Trainee traineeToUpdated = getTraineeByUsername(username);
-        traineeToUpdated.setDateOfBirth(dateOfBirth);
-        traineeToUpdated.setAddress(address);
-        traineeDao.save(traineeToUpdated);
-        LOGGER.debug("The {} was updated", traineeToUpdated);
-
-    }
-
-    @Override
-    @Transactional
-    public void changeActiveStatus(String username) {
-        Trainee traineeToSwitchStatus = getTraineeByUsername(username);
-        boolean newStatus = !traineeToSwitchStatus.getActive();
-        traineeToSwitchStatus.setActive(newStatus);
-        traineeDao.save(traineeToSwitchStatus);
-        LOGGER.debug("Trainee '{}' active status changed to {}", username, newStatus);
+    public void changeActiveStatus(String token, PatchUserRequestDto dto) {
+        authService.validateAuthentication(token);
+        Trainee traineeToSwitchStatus = getTraineeByUsername(dto.username());
+        traineeToSwitchStatus.setActive(dto.active());
+        traineeRepository.save(traineeToSwitchStatus);
+        LOGGER.debug("Trainee '{}' active status changed to {}",
+                traineeToSwitchStatus.getUsername(),
+                traineeToSwitchStatus.getActive());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Training> getTraineeTrainings(String username, LocalDate from, LocalDate to,
-                                              String trainerName, Long trainingTypeId) {
+    public List<TraineeTrainingsResponseDto> getTraineeTrainings(String token, String username,
+                                                                 TraineeTrainingsFilterRequestDto dto) {
+        authService.validateAuthentication(token);
         Trainee trainee = getTraineeByUsername(username);
         List <Training> filterTrainings = trainee.getTrainings().stream()
-                .filter(t -> from == null || !t.getTrainingDate().isBefore(from))
-                .filter(t -> to == null ||  !t.getTrainingDate().isAfter((to)))
-                .filter(t -> trainerName == null ||
-                        t.getTrainer().getFirstName().equalsIgnoreCase(trainerName))
-                .filter(t -> trainingTypeId == null ||
-                        t.getTrainingType().getId().equals(trainingTypeId))
+                .filter(t -> dto.periodFrom() == null || !t.getTrainingDate().isBefore(dto.periodFrom()))
+                .filter(t -> dto.periodTo() == null ||  !t.getTrainingDate().isAfter((dto.periodTo())))
+                .filter(t -> dto.trainerName() == null ||
+                        t.getTrainer().getFirstName().equalsIgnoreCase(dto.trainerName()))
+                .filter(t -> dto.trainingTypeId() == null ||
+                        t.getTrainingType().getId().equals(dto.trainingTypeId()))
                 .toList();
         LOGGER.info("The list of the trainee's training sessions was received with size {}",
                 filterTrainings.size());
@@ -117,13 +146,14 @@ public class TraineeServiceImpl implements TraineeService {
                         t.getTrainee().getUsername(),t.getTrainer().getUsername(),
                         t.getTrainer().getSpecialization().getName(), t.getTrainingType().getName())
         );
-        return filterTrainings;
+        return trainingMapper.trainingsToTraineeTrainingsResponseDto(filterTrainings);
     }
 
+    @Transactional(readOnly = true)
     private Trainee getTraineeByUsername(String username) {
-        return traineeDao.findByUsername(username)
+        return traineeRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Trainee was not found"));
+                        new NotFoundException("Trainee was not found"));
 
     }
 }
