@@ -1,6 +1,6 @@
 package com.epam.controller;
 
-import com.epam.dto.response.TrainingsTypeResponseDto;
+import com.epam.dto.response.TrainingTypeResponseDto;
 import com.epam.service.TrainingTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,7 +39,7 @@ public class TrainingTypeController {
             @ApiResponse(responseCode = "200", description = "List of TrainingsType"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token")
     })
-    public ResponseEntity<List<TrainingsTypeResponseDto>> getTrainingsType (@RequestHeader("Authorization") String token){
+    public ResponseEntity<List<TrainingTypeResponseDto>> getTrainingsType (@RequestHeader("Authorization") String token){
         LOGGER.info("Getting a trainingTypes in the app");
         return ResponseEntity.ok(trainingTypeService.getAllTrainingTypes(token));
     }

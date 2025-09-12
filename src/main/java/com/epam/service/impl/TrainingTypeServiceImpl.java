@@ -1,6 +1,6 @@
 package com.epam.service.impl;
 
-import com.epam.dto.response.TrainingsTypeResponseDto;
+import com.epam.dto.response.TrainingTypeResponseDto;
 import com.epam.exception.NotFoundException;
 import com.epam.mapper.TrainingTypeMapper;
 import com.epam.model.TrainingType;
@@ -45,7 +45,7 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TrainingsTypeResponseDto> getAllTrainingTypes(String token) {
+    public List<TrainingTypeResponseDto> getAllTrainingTypes(String token) {
         authService.validateAuthentication(token);
         List <TrainingType> trainingTypes = trainingTypeRepository.findAll();
         LOGGER.debug("The TrainingTypes list has {} elements ",trainingTypes.size());
