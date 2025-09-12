@@ -80,8 +80,10 @@ if you meet the installation requirements
 - open console (git bash, terminal, etc.)
 - git clone https://github.com/jdmonroyg/springbasegymcrm.git
 - cd springbasegymcrm
-- mvn clean install
+- mvn clean package
+- mvn jetty:run
 
 ## 🎥 Demo Video 
 - [GYM CRM VIDEO V1](https://youtu.be/o87Heqkcnlo)
 - [GYM CRM VIDEO V2](https://youtu.be/w2W7PWNIXQg)
+- [GYM CRM VIDEO V3](https://youtu.be/w2W7PWNIXQg)

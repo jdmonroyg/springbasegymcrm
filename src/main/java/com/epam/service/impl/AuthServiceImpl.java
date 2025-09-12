@@ -46,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
         LOGGER.debug("Authentication result for user '{}': {}", username, matches);
         if (!matches) {
             LOGGER.warn("User authentication failed: bad credentials");
-            throw new UnauthorizedException("Unauthorized trainee: invalid credentials");
+            throw new UnauthorizedException("Unauthorized user: invalid credentials");
         }
         String token = UUID.randomUUID().toString();
         tokenStore.put(token, user.getEmail());
