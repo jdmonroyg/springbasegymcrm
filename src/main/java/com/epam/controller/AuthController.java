@@ -1,7 +1,7 @@
 package com.epam.controller;
 
 import com.epam.dto.request.LoginRequestDto;
-import com.epam.dto.request.UpdateLoginDto;
+import com.epam.dto.request.UpdateLoginRequestDto;
 import com.epam.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,7 +57,7 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/password ")
+    @PutMapping("/password")
     @Operation(summary = "Update user password")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Password updated successfully"),
@@ -67,7 +67,7 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     public ResponseEntity<Void> changePassword(@RequestHeader("Authorization") String token,
-                                    @RequestBody @Valid UpdateLoginDto updateLoginDto){
+                                    @RequestBody @Valid UpdateLoginRequestDto updateLoginDto){
         LOGGER.info("The change password is starting");
         authService.changePassword(token, updateLoginDto);
         return ResponseEntity.noContent().build();

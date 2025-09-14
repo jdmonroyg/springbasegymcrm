@@ -102,7 +102,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
             @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
-    public ResponseEntity<List<TrainerTrainingsResponseDto>> getTrainerByUsername(
+    public ResponseEntity<List<TrainerTrainingsResponseDto>> getTrainerTrainingsByUsername(
             @RequestHeader("Authorization") String token, @PathVariable("username") String username,
             @ModelAttribute TrainerTrainingsFilterRequestDto filterDto) {
         LOGGER.info("Getting a trainer trainings");
@@ -121,10 +121,10 @@ public class TrainerController {
     })
     public ResponseEntity<List<TrainersResponseDto>> getUnassignedActiveTrainers(
             @RequestHeader("Authorization") String token, @PathVariable("traineeUsername") String traineeUsername) {
-        LOGGER.info("Getting a trainer trainings");
+        LOGGER.info("Get a list of active trainers not assigned to the trainee username");
         List<TrainersResponseDto> responseDto = trainerService
                 .getUnassignedTrainersByTraineeUsername(token, traineeUsername);
-        LOGGER.info("The trainer trainings list was getting");
+        LOGGER.info("The list of active trainer was getting");
         return ResponseEntity.ok(responseDto);
     }
 

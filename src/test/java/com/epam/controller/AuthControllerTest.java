@@ -1,12 +1,15 @@
 package com.epam.controller;
 
+import com.epam.dto.request.UpdateLoginRequestDto;
+import com.epam.exception.GlobalExceptionHandler;
 import com.epam.service.AuthService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -14,8 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -24,27 +27,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @project springbasegymcrm
  */
 
+@ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
     private MockMvc mockMvc;
 
-    private AutoCloseable closeable;
-
     @Mock
     private AuthService authService;
 
-
+    @InjectMocks
+    private AuthController authController;
 
     @BeforeEach
     void setUp()  {
-        closeable = MockitoAnnotations.openMocks(this);
-        AuthController authController = new AuthController(authService);
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        closeable.close();
+        mockMvc = MockMvcBuilders.standaloneSetup(authController)
+                .setControllerAdvice(new GlobalExceptionHandler()).build();
     }
 
     @Test
@@ -67,7 +64,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Login with Bad Request")
+    @DisplayName("Login with Bad Request 400")
     void loginWithBadPayload400() throws Exception {
         String badJson = "{}";
 
@@ -78,7 +75,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Login with Bad Credentials")
+    @DisplayName("Login with Bad  401")
     void loginFailed401() throws Exception {
         when(authService.login("user","wrongPass"))
                 .thenThrow(new ResponseStatusException(
@@ -97,10 +94,46 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Logout without token")
-    void logoutWithoutAuthorizationHeader400() throws Exception {
-        mockMvc.perform(post("/auth/logout"))
-                .andExpect(status().isBadRequest());
+    @DisplayName("Logout with token 204")
+    void logoutSuccess() throws Exception {
+        String token = getToken();
+        doNothing().when(authService).logout(token);
+        mockMvc.perform(post("/auth/logout")
+                .header("Authorization", token))
+                .andExpect(status().isNoContent());
     }
 
+    @Test
+    @DisplayName("Logout without token 401")
+    void logoutWithoutAuthorizationHeader400() throws Exception {
+        mockMvc.perform(post("/auth/logout"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Change password with token 204")
+    void changePasswordSuccess() throws Exception {
+        String token = getToken();
+
+        doNothing().when(authService).changePassword(token,
+                new UpdateLoginRequestDto("Jesus.Monroy","A2sca04S8x","iJm9N62fXa"));
+
+        String body = """
+                {
+                "username": "Jesus.Monroy",
+                "currentPassword": "A2sca04S8x",
+                "newPassword": "iJm9N62fXa"
+                }
+                """;
+
+        mockMvc.perform(put("/auth/password")
+                        .header("Authorization", token)
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isNoContent());
+    }
+
+    private static String getToken() {
+        return "Bearer " + UUID.randomUUID();
+    }
 }
