@@ -1,6 +1,6 @@
 package com.epam.service.impl;
 
-import com.epam.dto.request.UpdateLoginDto;
+import com.epam.dto.request.UpdateLoginRequestDto;
 import com.epam.exception.InvalidCurrentPasswordException;
 import com.epam.exception.InvalidSessionException;
 import com.epam.exception.NotFoundException;
@@ -67,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void changePassword(String token, UpdateLoginDto dto) {
+    public void changePassword(String token, UpdateLoginRequestDto dto) {
         LOGGER.info("validating token");
         validateAuthentication(token);
         User user = userRepository.findByUsername(dto.username())

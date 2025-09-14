@@ -1,25 +1,27 @@
 package com.epam.controller;
 
 import com.epam.dto.request.CreateTraineeRequestDto;
-import com.epam.dto.response.CreateUserResponseDto;
-import com.epam.dto.response.TraineeResponseDto;
+import com.epam.dto.request.PatchUserRequestDto;
+import com.epam.dto.request.TraineeTrainingsFilterRequestDto;
+import com.epam.dto.request.UpdateTraineeRequestDto;
+import com.epam.dto.response.*;
+import com.epam.exception.GlobalExceptionHandler;
 import com.epam.service.TraineeService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -28,25 +30,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author jdmon on 11/09/2025
  * @project springbasegymcrm
  */
+@ExtendWith(MockitoExtension.class)
 class TraineeControllerTest {
 
     private MockMvc mockMvc;
 
-    private AutoCloseable closeable;
-
     @Mock
     private TraineeService traineeService;
 
+    @InjectMocks
+    private TraineeController controller;
+
     @BeforeEach
     void setUp() {
-        closeable = MockitoAnnotations.openMocks(this);
-        TraineeController controller = new TraineeController(traineeService);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        closeable.close();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler()).build();
     }
 
     @Test
@@ -121,8 +119,113 @@ class TraineeControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+
+
+    @Test
+    @DisplayName("Update Trainee 200")
+    void updateTrainee() throws Exception {
+        String token = getToken();
+
+        UpdateTraineeRequestDto req = new UpdateTraineeRequestDto("Jesus.Monroy",
+                "Jesus", "Monroy",null,null, false);
+
+        String body = """
+            {
+            "username": "Jesus.Monroy",
+            "firstName": "Jesus",
+            "lastName": "Monroy",
+            "active": false
+            }
+            """;
+
+        TraineeUpdatedResponseDto resp = new TraineeUpdatedResponseDto("Jesus.Monroy",
+                new TraineeResponseDto("Jesus","Monroy","jd@gmail.com",
+                        null,null,false, Set.of()));
+
+        when(traineeService.updateTrainee(token,req)).thenReturn(resp);
+
+        mockMvc.perform(put("/trainees")
+                        .header("Authorization", token)
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.traineeResponseDto.firstName").value("Jesus"))
+                .andExpect(jsonPath("$.traineeResponseDto.lastName").value("Monroy"))
+                .andExpect(jsonPath("$.traineeResponseDto.email").value("jd@gmail.com"))
+                .andExpect(jsonPath("$.traineeResponseDto.active").value(false));
+    }
+
+    @Test
+    @DisplayName("Update active status Trainee 204")
+    void changeActiveStatus() throws Exception {
+        String token = getToken();
+        PatchUserRequestDto req = new PatchUserRequestDto("Pablo.Miranda", false);
+        String body = """
+            {
+            "username": "Pablo.Miranda",
+            "active": false
+            }
+            """;
+        doNothing().when(traineeService).changeActiveStatus(token, req);
+
+        mockMvc.perform(patch("/trainees")
+                        .header("Authorization", token)
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Get trainees username trainings 200")
+    void getTraineeByUsername() throws Exception {
+        String token = getToken();
+        String username = "Jesus.Monroy";
+
+        List<TraineeTrainingsResponseDto> resp = getTraineeTrainingsResponseDto();
+
+        when(traineeService.getTraineeTrainings(eq(token), eq(username),
+                any(TraineeTrainingsFilterRequestDto.class)))
+                .thenReturn(resp);
+
+        mockMvc.perform(get("/trainees/{username}/trainings", username)
+                .header("Authorization", token)
+                .param("periodFrom", "2025-09-01")
+                .param("periodTo", "2025-09-30")
+                .param("trainerName", "Carlos")
+                .param("trainingTypeId", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].trainingName").value("Morning Cardio"))
+                .andExpect(jsonPath("$[0].trainingType.id").value(2))
+                .andExpect(jsonPath("$[0].trainingType.name").value("Cardio"))
+                .andExpect(jsonPath("$[1].trainingName").value("Evening Strength"))
+                .andExpect(jsonPath("$[1].trainingType.id").value(1))
+                .andExpect(jsonPath("$[1].trainingType.name").value("Strength"));
+    }
+
     private static String getToken() {
         return "Bearer " + UUID.randomUUID();
     }
 
+    private static List<TraineeTrainingsResponseDto> getTraineeTrainingsResponseDto() {
+        TraineeTrainingsResponseDto traineeTraining1 = new TraineeTrainingsResponseDto(
+                "Morning Cardio",
+                LocalDate.of(2025, 9, 22),
+                new TrainingTypeResponseDto(2L, "Cardio"),
+                60,
+                "Carlos"
+        );
+
+        TraineeTrainingsResponseDto traineeTraining2 = new TraineeTrainingsResponseDto(
+                "Evening Strength",
+                LocalDate.of(2025, 9, 19),
+                new TrainingTypeResponseDto(1L, "Strength"),
+                45,
+                "Ana"
+        );
+
+        return List.of(traineeTraining1, traineeTraining2);
+    }
 }

@@ -1,13 +1,16 @@
 package com.epam.controller;
 
 import com.epam.dto.response.TrainingTypeResponseDto;
+import com.epam.exception.GlobalExceptionHandler;
 import com.epam.service.TrainingTypeService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -23,26 +26,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author jdmon on 11/09/2025
  * @project springbasegymcrm
  */
+@ExtendWith(MockitoExtension.class)
 class TrainingTypeControllerTest {
 
     private MockMvc mockMvc;
-    private TrainingTypeController controller;
-
-    private AutoCloseable closeable;
 
     @Mock
     private TrainingTypeService trainingTypeService;
 
+    @InjectMocks
+    private TrainingTypeController controller;
+
     @BeforeEach
     void setUp() {
-        closeable = MockitoAnnotations.openMocks(this);
-        controller = new TrainingTypeController(trainingTypeService);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        closeable.close();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler()).build();
     }
 
     @Test
@@ -66,6 +64,6 @@ class TrainingTypeControllerTest {
     @DisplayName("GET without header Authorization 400")
     void getTrainingTypesFailed() throws Exception {
         mockMvc.perform(get("/trainingTypes"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
     }
 }
