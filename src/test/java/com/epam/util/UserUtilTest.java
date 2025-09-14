@@ -21,21 +21,21 @@ class UserUtilTest {
 
     @Test
     @DisplayName("Checking password size")
-    void generateRandomPassword_returnsLength10(){
+    void generateRandomPasswordLength10(){
         String pwd = userUtil.generateRandomPassword();
         assertEquals(10, pwd.length());
     }
 
     @RepeatedTest(5)
     @DisplayName("Checking random password pattern")
-    void generateRandomPassword_onlyValidCharacters(){
+    void generateRandomPasswordValidCharacters(){
         String pwd = userUtil.generateRandomPassword();
         assertTrue(pwd.matches(REGEX_PASSWORD));
     }
 
     @RepeatedTest(5)
     @DisplayName("Checking two passwords with different values")
-    void generateRandomPassword_producesDifferentValues() {
+    void generateRandomPasswordDifferentValues() {
         String first = userUtil.generateRandomPassword();
         String second = userUtil.generateRandomPassword();
         assertNotEquals(first, second);
@@ -43,19 +43,17 @@ class UserUtilTest {
 
     @Test
     @DisplayName("Checking the username for the first time")
-    void generateUsername_noConflict() {
-        String username = userUtil.generateUsername("juan", "pérez", Set.of());
-        assertEquals("Juan.Pérez", username);
+    void generateUsername() {
+        String username = userUtil.generateUsername("juan", "perez", Set.of());
+        assertEquals("Juan.Perez", username);
     }
 
     @Test
     @DisplayName("conflict twice username")
-    void generateUsername_conflictTwice() {
+    void generateUsernameConflictTwice() {
         Set<String> existing = Set.of("Juan.Perez","Juan.Perez1");
         String username = userUtil.generateUsername("juan", "perez", existing);
         assertEquals("Juan.Perez2", username);
     }
-
-
 
 }
