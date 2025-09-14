@@ -35,6 +35,7 @@ public class TrainingController {
             @ApiResponse(responseCode = "200", description = "Training created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request: one or more required fields " +
                     "are missing or contain invalid values"),
+            @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
             @ApiResponse(responseCode = "404", description = "Trainee or Trainer not found")
     })
     public ResponseEntity<Void> createTraining(@RequestHeader("Authorization") String token,
