@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
             LOGGER.warn("Current password does not match for user: {}", dto.username());
             throw new InvalidCurrentPasswordException("The current password is incorrect");
         }
-        user.setPassword(dto.newPassword());
+        user.setPassword(encoder.encode(dto.newPassword()));
         LOGGER.info("The password was updated successfully");
         userRepository.save(user);
     }
