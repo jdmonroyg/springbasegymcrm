@@ -135,6 +135,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional(readOnly = true)
     public List<TrainersResponseDto> getUnassignedTrainersByTraineeUsername(String token, String traineeUsername) {
+        authService.validateAuthentication(token);
         List<Trainer> trainers = trainerRepository.findActiveUnassignedTrainersByTraineeUsername(traineeUsername);
         LOGGER.info("The list of the trainers was received with size {}",
                 trainers.size());

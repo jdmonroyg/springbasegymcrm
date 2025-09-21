@@ -21,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/trainers", //consumes = MediaType.APPLICATION_JSON_VALUE,
-produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    produces = MediaType.APPLICATION_JSON_VALUE)
 public class TrainerController {
 
     private final TrainerService trainerService;

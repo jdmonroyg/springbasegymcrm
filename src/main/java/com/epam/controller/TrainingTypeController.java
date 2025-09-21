@@ -22,7 +22,8 @@ import java.util.List;
  * @project springbasegymcrm
  */
 @RestController
-@RequestMapping(value = "/trainingTypes", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+@RequestMapping(value = "/trainingTypes",
+        produces = MediaType.APPLICATION_JSON_VALUE)
 public class TrainingTypeController {
 
     private final TrainingTypeService trainingTypeService;
