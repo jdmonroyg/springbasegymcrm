@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/trainees", //consumes = MediaType.APPLICATION_JSON_VALUE,
- produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    produces = MediaType.APPLICATION_JSON_VALUE)
 public class TraineeController {
 
     private final TraineeService traineeService;
@@ -121,7 +121,7 @@ public class TraineeController {
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
             @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
-    public ResponseEntity<List<TraineeTrainingsResponseDto>>  getTraineeByUsername(
+    public ResponseEntity<List<TraineeTrainingsResponseDto>>  getTraineeTrainingsByUsername(
             @RequestHeader("Authorization") String token, @PathVariable("username") String username,
                          @ModelAttribute TraineeTrainingsFilterRequestDto filterDto) {
         LOGGER.info("Getting a trainee trainings");

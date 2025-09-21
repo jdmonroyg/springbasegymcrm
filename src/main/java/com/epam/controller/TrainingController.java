@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(value = "/trainings", //consumes = MediaType.APPLICATION_JSON_VALUE,
- produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+        produces = MediaType.APPLICATION_JSON_VALUE)
 public class TrainingController {
 
     private final TrainingService trainingService;
