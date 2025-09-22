@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -41,12 +42,15 @@ class TrainingControllerTest {
     @InjectMocks
     private TrainingController trainingController;
 
+    private LocalDate trainingDate;
+
     @BeforeEach
     void setUp(){
         mockMvc = MockMvcBuilders
                 .standaloneSetup(trainingController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
+        trainingDate = LocalDate.now().plusDays(10);
     }
 
     @Test
@@ -59,10 +63,10 @@ class TrainingControllerTest {
           "traineeUsername": "Jesus.Monroy",
           "trainerUsername": "Carlos.Perez",
           "trainingName": "Cardio Blast",
-          "trainingDate": "2025-09-20",
+          "trainingDate": "%s",
           "durationInMinutes": 60
         }
-        """;
+        """.formatted(trainingDate);
 
         doNothing().when(trainingService)
                 .createTraining(eq(token), any(CreateTrainingRequestDto.class));
@@ -125,10 +129,10 @@ class TrainingControllerTest {
           "traineeUsername": "unknown.trainee",
           "trainerUsername": "unknown.trainer",
           "trainingName": "Cardio Blast",
-          "trainingDate": "2025-09-20",
+          "trainingDate": "%s",
           "durationInMinutes": 60
         }
-        """;
+        """.formatted(trainingDate);
 
         doThrow(new NotFoundException("Trainee or Trainer not found"))
                 .when(trainingService)
