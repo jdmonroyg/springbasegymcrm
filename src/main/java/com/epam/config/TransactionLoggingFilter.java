@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import java.util.UUID;
  * @author jdmon on 5/09/2025
  * @project springbasegymcrm
  */
+@Component
 public class TransactionLoggingFilter implements Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionLoggingFilter.class);
