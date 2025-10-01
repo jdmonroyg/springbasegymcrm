@@ -18,10 +18,9 @@ import java.util.List;
 public interface TraineeService {
 
     CreateUserResponseDto createTrainee(CreateTraineeRequestDto traineeRequest);
-    TraineeResponseDto selectTraineeByUsername(String token, String username);
-    void deleteTrainee(String token, String username);
+    TraineeResponseDto selectTraineeByUsername(String username);
+    void deleteTrainee(String username);
     TraineeUpdatedResponseDto updateTrainee(String token, UpdateTraineeRequestDto traineeRequest);
     void changeActiveStatus(String token, PatchUserRequestDto requestDto);
-    List<TraineeTrainingsResponseDto> getTraineeTrainings(String token, String username,
-                                                          TraineeTrainingsFilterRequestDto filterDto);
+    List<TraineeTrainingsResponseDto> getTraineeTrainings(String username, TraineeTrainingsFilterRequestDto filterDto);
 }

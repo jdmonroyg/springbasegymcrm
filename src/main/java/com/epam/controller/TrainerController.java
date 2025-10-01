@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,12 +55,12 @@ public class TrainerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Trainer found and returned successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
-    public ResponseEntity<TrainerResponseDto> getTrainerByUsername(@RequestHeader("Authorization") String token,
-                                                                   @PathVariable("username") String username) {
+    public ResponseEntity<TrainerResponseDto> getTrainerByUsername(@PathVariable("username") String username) {
         LOGGER.info("Getting a trainer with your list of trainers");
-        TrainerResponseDto responseDto = trainerService.selectTrainerByUsername(token, username);
+        TrainerResponseDto responseDto = trainerService.selectTrainerByUsername(username);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -69,13 +71,14 @@ public class TrainerController {
             @ApiResponse(responseCode = "400", description = "Invalid request: one or more required fields " +
                     "are missing or contain invalid values"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainer or TrainingType not found")
     })
     public ResponseEntity<TrainerUpdatedResponseDto> updateTrainer(
-            @RequestHeader("Authorization") String token,
+            @AuthenticationPrincipal UserDetails user,
             @RequestBody @Valid UpdateTrainerRequestDto trainerRequest) {
         LOGGER.info("Updating a trainer");
-        TrainerUpdatedResponseDto responseDto = trainerService.updateTrainer(token, trainerRequest);
+        TrainerUpdatedResponseDto responseDto = trainerService.updateTrainer(user.getUsername(), trainerRequest);
         LOGGER.info("A trainer was updated");
         return ResponseEntity.ok(responseDto);
     }
@@ -85,12 +88,13 @@ public class TrainerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Trainer patched successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "trainer not found")
     })
-    public ResponseEntity<Void> changeActiveStatus(@RequestHeader("Authorization") String token,
+    public ResponseEntity<Void> changeActiveStatus(@AuthenticationPrincipal UserDetails user,
                                                    @RequestBody @Valid PatchUserRequestDto requestDto) {
         LOGGER.info("Changing the active status of a trainer");
-        trainerService.changeActiveStatus(token, requestDto);
+        trainerService.changeActiveStatus(user.getUsername(), requestDto);
         LOGGER.info("The active status of a trainer was changing");
         return ResponseEntity.noContent().build();
     }
@@ -100,13 +104,14 @@ public class TrainerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Trainer trainings list was successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
     public ResponseEntity<List<TrainerTrainingsResponseDto>> getTrainerTrainingsByUsername(
-            @RequestHeader("Authorization") String token, @PathVariable("username") String username,
+            @PathVariable("username") String username,
             @ModelAttribute TrainerTrainingsFilterRequestDto filterDto) {
         LOGGER.info("Getting a trainer trainings");
-        List<TrainerTrainingsResponseDto> responseDto = trainerService.getTrainerTrainings(token, username,
+        List<TrainerTrainingsResponseDto> responseDto = trainerService.getTrainerTrainings(username,
                 filterDto);
         LOGGER.info("The trainer trainings list was getting");
         return ResponseEntity.ok(responseDto);
@@ -117,13 +122,14 @@ public class TrainerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Unassigned Active Trainers by trainee username"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
     public ResponseEntity<List<TrainersResponseDto>> getUnassignedActiveTrainers(
-            @RequestHeader("Authorization") String token, @PathVariable("traineeUsername") String traineeUsername) {
+             @PathVariable("traineeUsername") String traineeUsername) {
         LOGGER.info("Get a list of active trainers not assigned to the trainee username");
         List<TrainersResponseDto> responseDto = trainerService
-                .getUnassignedTrainersByTraineeUsername(token, traineeUsername);
+                .getUnassignedTrainersByTraineeUsername(traineeUsername);
         LOGGER.info("The list of active trainer was getting");
         return ResponseEntity.ok(responseDto);
     }

@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,12 +60,12 @@ public class TraineeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Trainee found and returned successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
-    public ResponseEntity<TraineeResponseDto> getTraineeByUsername(@RequestHeader("Authorization") String token,
-                                                                   @PathVariable("username") String username) {
+    public ResponseEntity<TraineeResponseDto> getTraineeByUsername(@PathVariable("username") String username) {
         LOGGER.info("Getting a trainee with your list of trainers");
-        TraineeResponseDto responseDto = traineeService.selectTraineeByUsername(token, username);
+        TraineeResponseDto responseDto = traineeService.selectTraineeByUsername(username);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -74,12 +76,13 @@ public class TraineeController {
             @ApiResponse(responseCode = "400", description = "Invalid request: one or more required fields " +
                     "are missing or contain invalid values"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
-    public ResponseEntity<TraineeUpdatedResponseDto> updateTrainee(@RequestHeader("Authorization") String token,
+    public ResponseEntity<TraineeUpdatedResponseDto> updateTrainee(@AuthenticationPrincipal UserDetails user,
                                                                    @RequestBody @Valid UpdateTraineeRequestDto traineeRequest) {
         LOGGER.info("Updating a trainee");
-        TraineeUpdatedResponseDto responseDto = traineeService.updateTrainee(token, traineeRequest);
+        TraineeUpdatedResponseDto responseDto = traineeService.updateTrainee(user.getUsername(), traineeRequest);
         LOGGER.info("A trainee was updated");
         return ResponseEntity.ok(responseDto);
     }
@@ -89,12 +92,12 @@ public class TraineeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Trainee deleted successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
-    public ResponseEntity<Void> DeleteTrainee(@RequestHeader("Authorization") String token,
-                                              @PathVariable("username") String username) {
+    public ResponseEntity<Void> DeleteTrainee(@PathVariable("username") String username) {
         LOGGER.info("Deleting a trainee");
-        traineeService.deleteTrainee(token, username);
+        traineeService.deleteTrainee(username);
         LOGGER.info("A trainee was deleting");
         return ResponseEntity.noContent().build();
     }
@@ -104,12 +107,13 @@ public class TraineeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Trainee Patched successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
-    public ResponseEntity<Void> changeActiveStatus(@RequestHeader("Authorization") String token,
+    public ResponseEntity<Void> changeActiveStatus(@AuthenticationPrincipal UserDetails user,
                                               @RequestBody @Valid PatchUserRequestDto requestDto) {
         LOGGER.info("Changing the active status of a trainee");
-        traineeService.changeActiveStatus(token, requestDto);
+        traineeService.changeActiveStatus(user.getUsername(), requestDto);
         LOGGER.info("The active status of a trainee was changing");
         return ResponseEntity.noContent().build();
     }
@@ -119,13 +123,14 @@ public class TraineeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Trainee trainings list was successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
             @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
     public ResponseEntity<List<TraineeTrainingsResponseDto>>  getTraineeTrainingsByUsername(
-            @RequestHeader("Authorization") String token, @PathVariable("username") String username,
+            @PathVariable("username") String username,
                          @ModelAttribute TraineeTrainingsFilterRequestDto filterDto) {
         LOGGER.info("Getting a trainee trainings");
-        List<TraineeTrainingsResponseDto> responseDto = traineeService.getTraineeTrainings(token, username, filterDto);
+        List<TraineeTrainingsResponseDto> responseDto = traineeService.getTraineeTrainings(username, filterDto);
         LOGGER.info("The trainee trainings list was getting");
         return ResponseEntity.ok(responseDto);
     }

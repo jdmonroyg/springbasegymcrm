@@ -11,10 +11,9 @@ import java.util.List;
  */
 public interface TrainerService {
     CreateUserResponseDto createTrainer(CreateTrainerRequestDto trainerRequest);
-    TrainerResponseDto selectTrainerByUsername(String token, String username);
-    TrainerUpdatedResponseDto updateTrainer(String token, UpdateTrainerRequestDto dto);
-    void changeActiveStatus(String token, PatchUserRequestDto requestDto);
-    List<TrainerTrainingsResponseDto> getTrainerTrainings(String token, String username,
-                                                          TrainerTrainingsFilterRequestDto filterDto);
-    List<TrainersResponseDto> getUnassignedTrainersByTraineeUsername(String token, String traineeUsername);
+    TrainerResponseDto selectTrainerByUsername(String username);
+    TrainerUpdatedResponseDto updateTrainer(String username, UpdateTrainerRequestDto dto);
+    void changeActiveStatus(String username, PatchUserRequestDto requestDto);
+    List<TrainerTrainingsResponseDto> getTrainerTrainings(String username, TrainerTrainingsFilterRequestDto filterDto);
+    List<TrainersResponseDto> getUnassignedTrainersByTraineeUsername(String traineeUsername);
 }

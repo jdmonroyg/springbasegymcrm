@@ -23,14 +23,13 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
 
     private final TrainingTypeRepository trainingTypeRepository;
     private final TrainingTypeMapper trainingTypeMapper;
-    private final AuthService authService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingTypeServiceImpl.class);
 
-    public TrainingTypeServiceImpl(TrainingTypeRepository trainingTypeRepository, TrainingTypeMapper trainingTypeMapper, AuthService authService) {
+    public TrainingTypeServiceImpl(TrainingTypeRepository trainingTypeRepository,
+                                   TrainingTypeMapper trainingTypeMapper) {
         this.trainingTypeRepository = trainingTypeRepository;
         this.trainingTypeMapper = trainingTypeMapper;
-        this.authService = authService;
     }
 
     @Override
@@ -46,7 +45,6 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
     @Override
     @Transactional(readOnly = true)
     public List<TrainingTypeResponseDto> getAllTrainingTypes(String token) {
-        authService.validateAuthentication(token);
         List <TrainingType> trainingTypes = trainingTypeRepository.findAll();
         LOGGER.debug("The TrainingTypes list has {} elements ",trainingTypes.size());
         return trainingTypeMapper.trainingTypesToTrainingTypesResponse(trainingTypeRepository.findAll());

@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -45,17 +47,17 @@ public class AuthController {
         return ResponseEntity.ok(token);
     }
 
-    @PostMapping("/logout")
-    @Operation(summary = "Logout user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Logout successful, token invalidated"),
-            @ApiResponse(responseCode = "401", description = "Invalid or expired authentication token")
-    })
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token){
-        LOGGER.info("The logout is starting");
-        authService.logout(token);
-        return ResponseEntity.noContent().build();
-    }
+//    @PostMapping("/logout")
+//    @Operation(summary = "Logout user")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "204", description = "Logout successful, token invalidated"),
+//            @ApiResponse(responseCode = "401", description = "Invalid or expired authentication token")
+//    })
+//    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token){
+//        LOGGER.info("The logout is starting");
+//        authService.logout(token);
+//        return ResponseEntity.noContent().build();
+//    }
 
     @PutMapping("/password")
     @Operation(summary = "Update user password")
@@ -66,10 +68,10 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<Void> changePassword(@RequestHeader("Authorization") String token,
+    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal UserDetails user,
                                     @RequestBody @Valid UpdateLoginRequestDto updateLoginDto){
         LOGGER.info("The change password is starting");
-        authService.changePassword(token, updateLoginDto);
+        authService.changePassword(user.getUsername(), updateLoginDto);
         return ResponseEntity.noContent().build();
     }
 
