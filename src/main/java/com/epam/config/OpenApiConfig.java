@@ -37,6 +37,6 @@ public class OpenApiConfig {
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()
                         .name(securitySchemeName)
                                 .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer").bearerFormat("UUID")));
+                                .scheme("bearer").bearerFormat("JWT")));
     }
 }

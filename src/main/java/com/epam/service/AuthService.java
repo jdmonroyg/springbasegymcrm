@@ -8,7 +8,6 @@ import com.epam.dto.request.UpdateLoginRequestDto;
  */
 public interface AuthService {
     String login(String username, String rawPassword);
-    void logout(String token);
-    void changePassword(String token, UpdateLoginRequestDto updateLoginDto);
-    void validateAuthentication(String token);
+//    void logout(String token);
+    void changePassword(String username, UpdateLoginRequestDto updateLoginDto);
 }

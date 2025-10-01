@@ -93,15 +93,15 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @DisplayName("Logout with token 204")
-    void logoutSuccess() throws Exception {
-        String token = getToken();
-        doNothing().when(authService).logout(token);
-        mockMvc.perform(post("/auth/logout")
-                .header("Authorization", token))
-                .andExpect(status().isNoContent());
-    }
+//    @Test
+//    @DisplayName("Logout with token 204")
+//    void logoutSuccess() throws Exception {
+//        String token = getToken();
+//        doNothing().when(authService).logout(token);
+//        mockMvc.perform(post("/auth/logout")
+//                .header("Authorization", token))
+//                .andExpect(status().isNoContent());
+//    }
 
     @Test
     @DisplayName("Logout without token 401")

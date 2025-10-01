@@ -10,8 +10,8 @@ import static com.epam.util.Constants.*;
  * @project springbasegymcrm
  */
 public record UpdateLoginRequestDto(
-        @NotBlank(message = INVALID_FIELD)
-        String username,
+//        @NotBlank(message = INVALID_FIELD)
+//        String username,
         @NotBlank (message = INVALID_FIELD)
         String currentPassword,
         @NotBlank (message = INVALID_FIELD)

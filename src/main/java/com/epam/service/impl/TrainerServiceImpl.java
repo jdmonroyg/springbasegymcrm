@@ -5,13 +5,13 @@ import com.epam.dto.response.*;
 import com.epam.exception.EmailAlreadyExistsException;
 import com.epam.mapper.TrainerMapper;
 import com.epam.mapper.TrainingMapper;
+import com.epam.model.Role;
 import com.epam.model.Trainer;
 import com.epam.model.Training;
 import com.epam.model.TrainingType;
 import com.epam.repository.TrainerRepository;
 import com.epam.repository.UserRepository;
-import com.epam.security.PasswordEncoder;
-import com.epam.service.AuthService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.epam.service.TrainerService;
 import com.epam.service.TrainingTypeService;
 import com.epam.util.UserUtil;
@@ -35,20 +35,19 @@ public class TrainerServiceImpl implements TrainerService {
     private final UserUtil userUtil;
     private final PasswordEncoder encoder;
     private final TrainerMapper trainerMapper;
-    private final AuthService authService;
     private final TrainingMapper trainingMapper;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainerServiceImpl.class);
 
-    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingTypeService trainingTypeService, UserRepository userRepository, UserUtil userUtil,
-                              PasswordEncoder encoder, TrainerMapper trainerMapper, AuthService authService, TrainingMapper trainingMapper) {
+    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainingTypeService trainingTypeService,
+                              UserRepository userRepository, UserUtil userUtil, PasswordEncoder encoder,
+                              TrainerMapper trainerMapper,  TrainingMapper trainingMapper) {
         this.trainerRepository = trainerRepository;
         this.trainingTypeService = trainingTypeService;
         this.userRepository = userRepository;
         this.userUtil = userUtil;
         this.encoder = encoder;
         this.trainerMapper = trainerMapper;
-        this.authService = authService;
         this.trainingMapper = trainingMapper;
     }
 
@@ -66,6 +65,7 @@ public class TrainerServiceImpl implements TrainerService {
         trainer.setUsername(username);
         trainer.setPassword(encoder.encode(firstPassword));
         trainer.setActive(true);
+        trainer.setRole(Role.TRAINER);
         trainerRepository.save(trainer);
         LOGGER.debug("The trainer {} was saved", username);
         return new CreateUserResponseDto(username, firstPassword);
@@ -74,8 +74,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional(readOnly = true)
-    public TrainerResponseDto selectTrainerByUsername(String token, String username) {
-        authService.validateAuthentication(token);
+    public TrainerResponseDto selectTrainerByUsername(String username) {
         Trainer trainerSelected = getTrainerByUsername(username);
         LOGGER.debug("The trainer {} was select", trainerSelected.getUsername());
         return trainerMapper.trainerToTrainerResponseDto(trainerSelected);
@@ -83,9 +82,8 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public TrainerUpdatedResponseDto updateTrainer(String token, UpdateTrainerRequestDto dto) {
-        authService.validateAuthentication(token);
-        Trainer trainerToUpdated = getTrainerByUsername(dto.username());
+    public TrainerUpdatedResponseDto updateTrainer(String username, UpdateTrainerRequestDto dto) {
+        Trainer trainerToUpdated = getTrainerByUsername(username);
         trainerToUpdated.setFirstName(dto.firstName());
         trainerToUpdated.setLastName(dto.lastName());
         trainerToUpdated.setSpecialization(trainingTypeService
@@ -98,9 +96,8 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public void changeActiveStatus(String token, PatchUserRequestDto dto) {
-        authService.validateAuthentication(token);
-        Trainer trainerToSwitchStatus = getTrainerByUsername(dto.username());
+    public void changeActiveStatus(String username, PatchUserRequestDto dto) {
+        Trainer trainerToSwitchStatus = getTrainerByUsername(username);
         trainerToSwitchStatus.setActive(dto.active());
         trainerRepository.save(trainerToSwitchStatus);
         LOGGER.debug("Trainer '{}' active status changed to {}",
@@ -110,9 +107,8 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TrainerTrainingsResponseDto> getTrainerTrainings(String token, String username,
+    public List<TrainerTrainingsResponseDto> getTrainerTrainings(String username,
                                                                  TrainerTrainingsFilterRequestDto dto) {
-        authService.validateAuthentication(token);
         Trainer trainer = getTrainerByUsername(username);
         List <Training> filterTrainings = trainer.getTrainings().stream()
                 .filter(t -> dto.periodFrom() == null || !t.getTrainingDate().isBefore(dto.periodFrom()))
@@ -134,8 +130,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TrainersResponseDto> getUnassignedTrainersByTraineeUsername(String token, String traineeUsername) {
-        authService.validateAuthentication(token);
+    public List<TrainersResponseDto> getUnassignedTrainersByTraineeUsername(String traineeUsername) {
         List<Trainer> trainers = trainerRepository.findActiveUnassignedTrainersByTraineeUsername(traineeUsername);
         LOGGER.info("The list of the trainers was received with size {}",
                 trainers.size());

@@ -1,4 +1,4 @@
-package com.epam.config;
+package com.epam.filter;
 
 
 import jakarta.servlet.*;

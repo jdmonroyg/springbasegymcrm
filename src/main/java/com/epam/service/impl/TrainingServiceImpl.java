@@ -27,23 +27,20 @@ public class TrainingServiceImpl implements TrainingService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final TrainingMapper trainingMapper;
-    private final AuthService authService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
     public TrainingServiceImpl(TrainingRepository trainingRepository, TraineeRepository traineeRepository,
-                               TrainerRepository trainerRepository, TrainingMapper trainingMapper, AuthService authService) {
+                               TrainerRepository trainerRepository, TrainingMapper trainingMapper ) {
         this.trainingRepository = trainingRepository;
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingMapper = trainingMapper;
-        this.authService = authService;
     }
 
     @Override
     @Transactional
     public void createTraining(String token, CreateTrainingRequestDto dto) {
-        authService.validateAuthentication(token);
         Trainee trainee = traineeRepository.findByUsername(dto.traineeUsername())
                 .orElseThrow(() -> new NotFoundException("Trainee was not found"));
         Trainer trainer = trainerRepository.findByUsername(dto.trainerUsername())

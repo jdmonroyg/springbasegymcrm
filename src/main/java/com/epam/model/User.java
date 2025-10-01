@@ -33,6 +33,9 @@ public abstract class User implements Serializable {
     @Column(nullable = false)
     protected String password;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Column(nullable = false)
     protected Boolean active;
 
@@ -87,6 +90,14 @@ public abstract class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public Boolean getActive() {
