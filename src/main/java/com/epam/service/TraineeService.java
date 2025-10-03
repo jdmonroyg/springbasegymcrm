@@ -20,7 +20,7 @@ public interface TraineeService {
     CreateUserResponseDto createTrainee(CreateTraineeRequestDto traineeRequest);
     TraineeResponseDto selectTraineeByUsername(String username);
     void deleteTrainee(String username);
-    TraineeUpdatedResponseDto updateTrainee(String token, UpdateTraineeRequestDto traineeRequest);
-    void changeActiveStatus(String token, PatchUserRequestDto requestDto);
+    TraineeUpdatedResponseDto updateTrainee(String username, UpdateTraineeRequestDto traineeRequest);
+    void changeActiveStatus(String username, PatchUserRequestDto requestDto);
     List<TraineeTrainingsResponseDto> getTraineeTrainings(String username, TraineeTrainingsFilterRequestDto filterDto);
 }

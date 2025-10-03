@@ -48,8 +48,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/auth/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/trainees").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/trainers").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/trainees", "/trainers").permitAll()
+                                .requestMatchers("/actuator/**").permitAll()
                                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**",
                                         "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
                                 .requestMatchers("/trainees/**").hasRole("TRAINEE")
