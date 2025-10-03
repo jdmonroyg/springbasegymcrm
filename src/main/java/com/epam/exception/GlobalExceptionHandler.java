@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
@@ -63,6 +64,11 @@ public class GlobalExceptionHandler {
                 .body("error bad credentials");
     }
 
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<String> handleLocked(LockedException e) {
+        LOGGER.warn(e.getMessage());
+        return ResponseEntity.status(423).body(e.getMessage());
+    }
 
     @ExceptionHandler(InvalidCurrentPasswordException.class)
     public ResponseEntity<String> handleException(InvalidCurrentPasswordException e) {

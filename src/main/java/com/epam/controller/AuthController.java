@@ -39,6 +39,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid request: one or more required fields " +
                     "are missing or contain invalid values"),
             @ApiResponse(responseCode = "401", description = "Invalid username or password"),
+            @ApiResponse(responseCode = "423", description = "User account locked due to multiple failed login attempts")
     })
     public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDto loginRequestDto){
         LOGGER.info("The login is starting");
