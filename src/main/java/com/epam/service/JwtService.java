@@ -2,6 +2,8 @@ package com.epam.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
+
 /**
  * @author jdmon on 29/09/2025
  * @project springbasegymcrm
@@ -9,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public interface JwtService {
     String getToken(UserDetails userDetails);
     String getUsername(String token);
+    Instant getExpiration(String token);
     boolean isTokenValid(String token, UserDetails userDetails);
 
 }

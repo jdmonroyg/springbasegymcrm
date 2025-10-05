@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -51,6 +52,12 @@ public class JwtServiceImpl implements JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         String username = getUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    @Override
+    public Instant getExpiration(String token) {
+        Date expiration = getAllClaims(token).getExpiration();
+        return expiration.toInstant();
     }
 
     private boolean isTokenExpired(String token) {
