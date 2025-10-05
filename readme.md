@@ -145,4 +145,6 @@ Once enabled, you will be able to:
 - [GYM CRM VIDEO V1](https://youtu.be/o87Heqkcnlo)
 - [GYM CRM VIDEO V2](https://youtu.be/w2W7PWNIXQg)
 - [GYM CRM VIDEO V3](https://youtu.be/1_aTo8xAp7c)
-- [GYM CRM VIDEO V4](https://youtu.be/nlWGZcHzJIs)  
+- [GYM CRM VIDEO V4](https://youtu.be/nlWGZcHzJIs)
+- [GYM CRM VIDEO V5](https://youtu.be/O3wcJW55sc0)
+  

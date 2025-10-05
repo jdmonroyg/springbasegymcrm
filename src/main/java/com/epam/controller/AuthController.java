@@ -6,6 +6,7 @@ import com.epam.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,17 +49,17 @@ public class AuthController {
         return ResponseEntity.ok(token);
     }
 
-//    @PostMapping("/logout")
-//    @Operation(summary = "Logout user")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "204", description = "Logout successful, token invalidated"),
-//            @ApiResponse(responseCode = "401", description = "Invalid or expired authentication token")
-//    })
-//    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token){
-//        LOGGER.info("The logout is starting");
-//        authService.logout(token);
-//        return ResponseEntity.noContent().build();
-//    }
+    @PostMapping("/logout")
+    @Operation(summary = "Logout user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Logout successful, token invalidated"),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired authentication token")
+    })
+    public ResponseEntity<Void> logout(HttpServletRequest request){
+        LOGGER.info("The logout is starting");
+        authService.logout(request);
+        return ResponseEntity.noContent().build();
+    }
 
     @PutMapping("/password")
     @Operation(summary = "Update user password")

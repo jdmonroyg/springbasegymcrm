@@ -56,6 +56,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
+    @ExceptionHandler(TokenRevokedException.class)
+    public ResponseEntity<String> handleException(TokenRevokedException e){
+        LOGGER.warn("Token was revoked: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
+
     @ExceptionHandler({ BadCredentialsException.class, UsernameNotFoundException.class })
     public ResponseEntity<String> handleException(AuthenticationException e) {
         LOGGER.warn("Authentication failed {}", e.getMessage());
@@ -65,7 +71,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(LockedException.class)
-    public ResponseEntity<String> handleLocked(LockedException e) {
+    public ResponseEntity<String> handleException(LockedException e) {
         LOGGER.warn(e.getMessage());
         return ResponseEntity.status(423).body(e.getMessage());
     }
@@ -81,8 +87,6 @@ public class GlobalExceptionHandler {
         LOGGER.warn("Inactive user exception: {}", e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
-
-
 
     public record DataError(String field, String error) {
         public DataError(FieldError error) {

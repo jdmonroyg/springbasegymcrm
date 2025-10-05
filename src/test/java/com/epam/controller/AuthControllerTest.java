@@ -3,6 +3,7 @@ package com.epam.controller;
 import com.epam.dto.request.UpdateLoginRequestDto;
 import com.epam.exception.GlobalExceptionHandler;
 import com.epam.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,22 +117,16 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-//    @Test
-//    @DisplayName("Logout with token 204")
-//    void logoutSuccess() throws Exception {
-//        String token = getToken();
-//        doNothing().when(authService).logout(token);
-//        mockMvc.perform(post("/auth/logout")
-//                .header("Authorization", token))
-//                .andExpect(status().isNoContent());
-//    }
-
-//    @Test
-//    @DisplayName("Logout without token 401")
-//    void logoutWithoutAuthorizationHeader400() throws Exception {
-//        mockMvc.perform(post("/auth/logout"))
-//                .andExpect(status().isUnauthorized());
-//    }
+    @Test
+    @DisplayName("Logout with token 204")
+    void logoutSuccess() throws Exception {
+        String token = getToken();
+        doNothing().when(authService).logout(any(HttpServletRequest.class));
+        mockMvc.perform(post("/auth/logout")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+        verify(authService, times(1)).logout(any(HttpServletRequest.class));
+    }
 
     @Test
     @DisplayName("Change password with user authenticated 204")

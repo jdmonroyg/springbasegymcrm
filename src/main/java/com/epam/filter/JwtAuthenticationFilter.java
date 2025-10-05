@@ -1,6 +1,8 @@
 package com.epam.filter;
 
+import com.epam.exception.TokenRevokedException;
 import com.epam.service.JwtService;
+import com.epam.service.TokenBlackListService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,10 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlackListService bl;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService,
+                                   TokenBlackListService bl) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.bl = bl;
     }
 
     @Override
@@ -41,6 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = Objects.requireNonNull(authHeader).substring(7);
+
+        if (bl.isBlackListed(jwt)){
+            throw new TokenRevokedException("Token is revoked");
+        }
+
         final String username = jwtService.getUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
