@@ -5,7 +5,6 @@ import com.epam.exception.NotFoundException;
 import com.epam.mapper.TrainingTypeMapper;
 import com.epam.model.TrainingType;
 import com.epam.repository.TrainingTypeRepository;
-import com.epam.service.AuthService;
 import com.epam.service.TrainingTypeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

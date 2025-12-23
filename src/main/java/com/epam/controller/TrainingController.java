@@ -38,11 +38,27 @@ public class TrainingController {
             @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
             @ApiResponse(responseCode = "404", description = "Trainee or Trainer not found")
     })
-    public ResponseEntity<Void> createTraining(@RequestHeader("Authorization") String token,
-                                               @RequestBody @Valid CreateTrainingRequestDto trainingRequest) {
+    public ResponseEntity<Void> createTraining(@RequestBody @Valid CreateTrainingRequestDto trainingRequest) {
         LOGGER.info("creating a training");
-        trainingService.createTraining(token, trainingRequest);
+        trainingService.createTraining(trainingRequest);
         LOGGER.info("A training was created");
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a trainee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Training deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid or missing authentication token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: user does not have the required role"),
+            @ApiResponse(responseCode = "404", description = "Training not found")
+    })
+    public ResponseEntity<Void> deleteTraining(@PathVariable("id")Long id){
+        LOGGER.info("Deleting a training");
+        trainingService.deleteTraining(id);
+        LOGGER.info("A training was deleting");
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

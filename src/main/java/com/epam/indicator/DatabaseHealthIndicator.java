@@ -1,7 +1,7 @@
 package com.epam.indicator;
 
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -22,7 +22,7 @@ public class DatabaseHealthIndicator implements HealthIndicator {
     }
 
     @Override
-    public Health health() {
+    public org.springframework.boot.health.contributor.Health health() {
         try (Connection connection = dataSource.getConnection()){
             if (connection.isValid(2000)) {
                 return Health.up()

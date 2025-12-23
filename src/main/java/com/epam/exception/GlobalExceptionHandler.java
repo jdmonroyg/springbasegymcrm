@@ -88,6 +88,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
+    @ExceptionHandler(DownstreamServiceException.class)
+    public ResponseEntity<String> handleException(DownstreamServiceException e){
+        LOGGER.warn("DownstreamServiceException exception: {}", e.getMessage());
+        return  ResponseEntity.status(HttpStatus.OK).body("OK_WITH_DOWNSTREAM_FAILURE");
+    }
+
     public record DataError(String field, String error) {
         public DataError(FieldError error) {
             this(error.getField(), error.getDefaultMessage());

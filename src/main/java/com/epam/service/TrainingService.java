@@ -8,5 +8,6 @@ import com.epam.dto.request.CreateTrainingRequestDto;
  */
 public interface TrainingService {
 
-    void createTraining(String token, CreateTrainingRequestDto requestDto);
+    void createTraining(CreateTrainingRequestDto requestDto);
+    void deleteTraining(Long id);
 }

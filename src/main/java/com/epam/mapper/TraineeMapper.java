@@ -25,5 +25,6 @@ public interface TraineeMapper {
     @Mapping(target = "active", ignore = true)
     @Mapping(target = "trainers", ignore = true)
     @Mapping(target = "trainings", ignore = true)
+    @Mapping(target = "role", ignore = true)
     Trainee createTraineeRequestDtoToTrainee(CreateTraineeRequestDto dto);
 }

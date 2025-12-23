@@ -3,7 +3,6 @@ package com.epam.controller;
 import com.epam.dto.request.CreateTrainingRequestDto;
 import com.epam.exception.GlobalExceptionHandler;
 import com.epam.exception.NotFoundException;
-import com.epam.service.TrainerService;
 import com.epam.service.TrainingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +19,6 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -69,7 +67,7 @@ class TrainingControllerTest {
         """.formatted(trainingDate);
 
         doNothing().when(trainingService)
-                .createTraining(eq(token), any(CreateTrainingRequestDto.class));
+                .createTraining(any(CreateTrainingRequestDto.class));
 
         mockMvc.perform(post("/trainings")
                         .header("Authorization", token)
@@ -101,25 +99,6 @@ class TrainingControllerTest {
     }
 
     @Test
-    @DisplayName("POST createTraining 401")
-    void createTrainingMissingToken() throws Exception {
-        String jsonRequest = """
-        {
-          "traineeUsername": "Jesus.Monroy",
-          "trainerUsername": "Carlos.Perez",
-          "trainingName": "Cardio Blast",
-          "trainingDate": "2025-09-20",
-          "durationInMinutes": 60
-        }
-        """;
-
-        mockMvc.perform(post("/trainings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
-                .andExpect(status().isUnauthorized()); // o isBadRequest() si tu advice lo traduce así
-    }
-
-    @Test
     @DisplayName("POST createTraining 404")
     void createTrainingUserNotFound() throws Exception {
         String token = "Bearer valid-token";
@@ -136,7 +115,7 @@ class TrainingControllerTest {
 
         doThrow(new NotFoundException("Trainee or Trainer not found"))
                 .when(trainingService)
-                .createTraining(eq(token), any(CreateTrainingRequestDto.class));
+                .createTraining(any(CreateTrainingRequestDto.class));
 
         mockMvc.perform(post("/trainings")
                         .header("Authorization", token)
