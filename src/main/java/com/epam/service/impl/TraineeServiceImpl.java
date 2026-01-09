@@ -34,7 +34,6 @@ import java.util.List;
 @Service
 public class TraineeServiceImpl implements TraineeService {
 
-
     private final TraineeRepository traineeRepository;
     private final UserRepository userRepository;
     private final UserUtil userUtil;
