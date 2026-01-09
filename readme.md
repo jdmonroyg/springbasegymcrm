@@ -11,23 +11,28 @@ production-ready backend.
 
 ## 🧩 Features
 
-- **Domain model** with joined inheritance for **Users**, **Trainees**, **Trainers**, 
-Trainings, and TrainingTypes
+- **Domain model** with joined inheritance for **Users**, **Trainees**, **Trainers**,
+  **Trainings**, and **TrainingTypes**
 - **Persistence layer** powered by Spring Data JPA with custom JpaRepository interfaces
-- **Service layer** handling business logic, validation, and transaction management
-- **RESTful controllers** exposing endpoints for trainees, trainers, trainings, and authentication
+- **Service layer** encapsulating business logic, validation, and transaction management
+- **RESTFul controllers** exposing endpoints for trainees, trainers, trainings,training types, and authentication
 - **Exception handling** via centralized @RestControllerAdvice with custom error responses
 - **Input validation** using Hibernate Validator (@Valid, @NotNull, @Min, etc.)
-- **Secure password encoding** with BCrypt
+- **Secure authentication & authorization** with JWT and role-based access control
+- **Password encoding** with BCrypt for strong security
+- **Custom filters** for JWT validation and transaction logging
+- **Application metrics & health checks** via Actuator indicators (database, training metrics, user metrics)
 - **Initial data loading** - via import.sql (H2) and data.sql (Postgres)
 - **Unit tests** for all controllers using MockMvc, Mockito, and JUnit 5
 
 ## 🛠 Stack
+
 - **Java 21**
 - **Maven 3.6+**
-- **Spring Boot**
+- **Spring Boot 4**
 - **Spring Web MVC**
-- **Spring Data JPA**
+- **Spring Data JPA / Hibernate**
+- **Spring Security (JWT authentication & role-based authorization)**
 - **Spring Boot Validation (Hibernate Validator)**
 - **Spring Boot Actuator**
 - **Micrometer + Prometheus**
@@ -36,24 +41,29 @@ Trainings, and TrainingTypes
 - **MockMvc**
 - **PostgreSQL (dev)**
 - **H2 (in-memory DB for local profile)**
-- **SLF4J + Logback**
+- **SLF4J + Logback** (structured logging with MDC)
 - **Spring doc OpenAPI (Swagger UI)**
 
 ## ✅ Prerequisites
+
 - **Java 21 SDK** – required to compile and run the application
-- **Apache Maven 3.6+** – for build and dependency management
-- **PostgreSQL 14+ instance** – primary database for dev profile
-- **H2 Database** - in‑memory database for the local profile (no external setup required)
+- **Apache Maven 3.6+** – build and dependency management
+- **Spring Boot 4 parent** – ensures consistent dependency versions
+- **PostgreSQL 14+ instance** – primary database for the `dev` and `prod` profiles
+- **H2 Database** – in‑memory database for the `local` profile (no external setup required)
+- **ActiveMQ broker** (for messaging integration)
 - **Git** – version control
-- **IntelliJ IDEA** (optional) – recommended IDE for development
+- **IntelliJ IDEA / Eclipse** (optional) – recommended IDEs for development
 
 ## ⚙️ Configuration
+
 ### Common properties
 - server.port= <your port>
 - server.servlet.context.path= /api/v1
 - spring.profiles.active= dev
 - management.endpoints.web.exposure.include= health, info, prometheus, metrics
 - management.endpoint.health.show-details= always
+
 ### Development profile (PostgreSql)
 - spring.datasource.url=jdbc:postgresql://<your_url>
 - spring.datasource.username=<your_db_user>
@@ -76,42 +86,51 @@ src
  ├── main
  │   ├── java
  │   │   └── com.epam
- │   │       ├── config                 # Spring Boot configuration classes (beans, filters, setup)
- │   │       ├── controller             # REST controllers for trainees, trainers, trainings, auth
+ │   │       ├── client                 # Feign clients and fallbacks for inter‑service communication
+ │   │       ├── config                 # Spring Boot configuration (Feign, OpenAPI, Security)
+ │   │       ├── controller             # REST controllers (Auth, Trainee, Trainer, Training, TrainingType)
  │   │       ├── dto                    # Request/Response DTOs (API contracts)
- │   │       ├── exception              # Custom exceptions and @RestControllerAdvice handlers
- │   │       ├── indicator              # Health indicators and metrics instrumentation
+ │   │       ├── exception              # Custom exceptions and global exception handler
+ │   │       ├── filter                 # JWT authentication and transaction logging filters
+ │   │       ├── indicator              # Health indicators and application metrics
+ │   │       ├── listener               # Authentication event listeners (success/failure)
  │   │       ├── mapper                 # MapStruct mappers for entity <-> DTO conversion
- │   │       ├── model                  # JPA entity classes
+ │   │       ├── model                  # JPA entities (User, Trainer, Trainee, Training, TrainingType, Role)
  │   │       ├── repository             # Spring Data JPA repositories
- │   │       ├── security               # Security utilities (PasswordEncoder, auth helpers)
- │   │       ├── service                # Business service interfaces and implementations
- │   │       └── util                   # Utility classes (UserUtil, Constants, helpers)
+ │   │       ├── service                # Business service interfaces
+ │   │       ├── service/impl           # Service implementations
+ │   │       └── util                   # Utility classes (UserUtil, Constants)
  │   │       GymCrmApplication.java     # Main entry point of the Spring Boot application
  │   └── resources
- │       ├── application.yml            # Common configuration (shared across profiles)
- │       ├── application-dev.yml        # Development profile (PostgreSQL)
- │       ├── application-local.yml      # Local profile (H2 in-memory)
+ │       ├── application.yaml           # Common configuration (profiles)
+ │       ├── application-dev.yaml       # Development profile (PostgreSQL)
+ │       ├── application-local.yaml     # Local profile (H2 in‑memory)
  │       ├── data-dev.sql               # SQL script for dev data initialization
- │       ├── import.sql                 # Default SQL initialization (Hibernate) for H2
+ │       ├── import.sql                 # Default SQL initialization (Hibernate/H2)
  │       └── logback.xml                # Logback logging configuration
  │
  └── test
      └── java
-         └── com.epam                   # Unit tests with MockMvc + Mockito
-
+         └── com.epam
+             ├── controller             # Controller tests using MockMvc
+             └── util                   # Utility tests
 ```
 
 ## 🧱 Architecture - Layered Design
-- **Configuration Layer** – Spring Boot configuration classes (beans, filters, profile setup)
-- **Model Layer** – JPA entity classes representing the domain model
+
+- **Configuration Layer** – Spring Boot configuration classes (Feign, OpenAPI, Security, profile setup)
+- **Client Layer** – Feign clients and fallback implementations for inter‑service communication
+- **Model Layer** – JPA entity classes representing the domain model (User, Trainer, Trainee, Training, TrainingType, Role)
 - **Repository Layer** – Spring Data JPA repositories for persistence operations
 - **Service Layer** – Business logic, validation, and transaction management
-- **Controller Layer** – REST controllers exposing API endpoints
+    - Interfaces in `service`
+    - Implementations in `service/impl`
+- **Controller Layer** – REST controllers exposing API endpoints (Auth, Trainee, Trainer, Training, TrainingType)
 - **DTO & Mapper Layer** – Request/Response DTOs and MapStruct mappers for entity ↔ DTO conversion
-- **Exception Handling Layer** – Centralized error handling via @RestControllerAdvice
-- **Utility Layer** – Shared helpers, constants, and reusable components
-- **Monitoring Layer** – Health indicators and metrics instrumentation for observability
+- **Exception Handling Layer** – Custom exceptions and centralized error handling via `GlobalExceptionHandler`
+- **Security Layer** – JWT authentication filter, transaction logging filter, and authentication event listeners
+- **Utility Layer** – Shared helpers and constants (e.g., `UserUtil`, `Constants`)
+- **Monitoring Layer** – Health indicators and application metrics for observability
 
 ## 🚀 How to Run
 If you meet the installation requirements:
@@ -121,6 +140,10 @@ If you meet the installation requirements:
 - cd springbasegymcrm
 - Build the project:
   mvn clean package
+
+### ⚡ Start Eureka Server
+Before running any microservice, make sure the Eureka Server is up and running
+
 ### Run the application with Spring Boot
 
 #### Run with PostgreSQL (development profile)
