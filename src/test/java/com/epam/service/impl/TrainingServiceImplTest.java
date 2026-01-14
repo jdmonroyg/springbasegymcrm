@@ -1,6 +1,6 @@
 package com.epam.service.impl;
 
-import com.epam.client.WorkloadClient;
+//import com.epam.client.WorkloadClient;
 import com.epam.dto.request.CreateTrainingRequestDto;
 import com.epam.dto.request.WorkloadRequestDTO;
 import com.epam.exception.NotFoundException;
@@ -14,6 +14,7 @@ import com.epam.repository.TrainerRepository;
 import com.epam.repository.TrainingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.jms.core.JmsTemplate;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -31,7 +32,7 @@ class TrainingServiceImplTest {
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
     private TrainingMapper trainingMapper;
-    private WorkloadClient workloadClient;
+    private JmsTemplate jmsTemplate;
     private TrainingServiceImpl service;
 
     @BeforeEach
@@ -40,9 +41,9 @@ class TrainingServiceImplTest {
         traineeRepository = mock(TraineeRepository.class);
         trainerRepository = mock(TrainerRepository.class);
         trainingMapper = mock(TrainingMapper.class);
-        workloadClient = mock(WorkloadClient.class);
+        jmsTemplate = mock(JmsTemplate.class);
 
-        service = new TrainingServiceImpl(trainingRepository, traineeRepository, trainerRepository, trainingMapper, workloadClient);
+        service = new TrainingServiceImpl(trainingRepository, traineeRepository, trainerRepository, trainingMapper, jmsTemplate);
     }
 
     @Test
@@ -74,7 +75,7 @@ class TrainingServiceImplTest {
         service.deleteTraining(1L);
 
         verify(trainingRepository).delete(training);
-        verify(workloadClient).updateWorkload(any(WorkloadRequestDTO.class), any());
+        verify(jmsTemplate).convertAndSend(eq("workload.queue"), any(WorkloadRequestDTO.class), any());
     }
 
     @Test
@@ -83,6 +84,4 @@ class TrainingServiceImplTest {
 
         assertThrows(NotFoundException.class, () -> service.deleteTraining(1L));
     }
-
-
 }
