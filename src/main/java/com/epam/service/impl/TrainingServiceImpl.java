@@ -1,6 +1,5 @@
 package com.epam.service.impl;
 
-import com.epam.client.WorkloadClient;
 import com.epam.dto.request.CreateTrainingRequestDto;
 import com.epam.dto.request.WorkloadRequestDTO;
 import com.epam.exception.DownstreamServiceException;
@@ -17,6 +16,7 @@ import com.epam.service.TrainingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,17 +30,20 @@ public class TrainingServiceImpl implements TrainingService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final TrainingMapper trainingMapper;
-    private final WorkloadClient workloadClient;
+    private final JmsTemplate jmsTemplate;
+//    private final WorkloadClient workloadClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingServiceImpl.class);
+    private static final String WORKLOAD_QUEUE = "workload.queue";
 
     public TrainingServiceImpl(TrainingRepository trainingRepository, TraineeRepository traineeRepository,
-                               TrainerRepository trainerRepository, TrainingMapper trainingMapper, WorkloadClient workloadClient) {
+                               TrainerRepository trainerRepository, TrainingMapper trainingMapper,
+                               JmsTemplate jmsTemplate) {
         this.trainingRepository = trainingRepository;
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingMapper = trainingMapper;
-        this.workloadClient = workloadClient;
+        this.jmsTemplate = jmsTemplate;
     }
 
     @Override
@@ -66,12 +69,15 @@ public class TrainingServiceImpl implements TrainingService {
                 trainer.getLastName(), trainer.getActive(), trainingToSave.getTrainingDate(),
                 trainingToSave.getDurationInMinutes(), "ADD");
 
-        try {
-            LOGGER.debug("Notifying workload service for trainer {}", trainer.getUsername());
-            workloadClient.updateWorkload(workloadRequest, MDC.get("transactionId"));
-        } catch (Exception e){
-            throw new DownstreamServiceException("Failed to update workload service: " + e.getMessage());
-        }
+//        try {
+        LOGGER.debug("Notifying workload service for trainer {}", trainer.getUsername());
+        jmsTemplate.convertAndSend(WORKLOAD_QUEUE, workloadRequest, message -> {
+            message.setStringProperty("transactionId", MDC.get("transactionId"));
+            return message;
+        });
+//        } catch (Exception e){
+//            throw new DownstreamServiceException("Failed to update workload service: " + e.getMessage());
+//        }
 
 
     }
@@ -90,11 +96,16 @@ public class TrainingServiceImpl implements TrainingService {
                 training.getTrainingDate(),
                 training.getDurationInMinutes(), "DELETE");
 
-        try {
-            LOGGER.debug("Deleted training {}, notifying workload service", training.getId());
-            workloadClient.updateWorkload(workloadRequest, MDC.get("transactionId"));
-        } catch (Exception e){
-            throw new DownstreamServiceException("Failed to delete workload service: " + e.getMessage());
-        }
+        jmsTemplate.convertAndSend(WORKLOAD_QUEUE, workloadRequest, message -> {
+            message.setStringProperty("transactionId", MDC.get("transactionId"));
+            return message;
+        });
+
+//        try {
+//            LOGGER.debug("Deleted training {}, notifying workload service", training.getId());
+//            workloadClient.updateWorkload(workloadRequest, MDC.get("transactionId"));
+//        } catch (Exception e){
+//            throw new DownstreamServiceException("Failed to delete workload service: " + e.getMessage());
+//        }
     }
 }

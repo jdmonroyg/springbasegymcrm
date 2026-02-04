@@ -1,29 +1,29 @@
-package com.epam.config;
-
-import feign.RequestInterceptor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-/**
- * @author jdmon on 21/12/2025
- * @project springbasegymcrm
- */
-@Configuration
-public class FeignClientConfig {
-
-    @Bean
-    public RequestInterceptor requestInterceptor(){
-        return requestTemplate -> {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (attributes != null) {
-                String authHeader = attributes.getRequest().getHeader("Authorization");
-                if (authHeader != null) {
-                    requestTemplate.header("Authorization", authHeader);
-                }
-            }
-        };
-    }
-}
+//package com.epam.config;
+//
+//import feign.RequestInterceptor;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.web.context.request.RequestContextHolder;
+//import org.springframework.web.context.request.ServletRequestAttributes;
+//
+///**
+// * @author jdmon on 21/12/2025
+// * @project springbasegymcrm
+// */
+//@Configuration
+//public class FeignClientConfig {
+//
+//    @Bean
+//    public RequestInterceptor requestInterceptor(){
+//        return requestTemplate -> {
+////            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+//            if (attributes != null) {
+//                String authHeader = attributes.getRequest().getHeader("Authorization");
+//                if (authHeader != null) {
+//                    requestTemplate.header("Authorization", authHeader);
+//                }
+//            }
+//        };
+//    }
+//}

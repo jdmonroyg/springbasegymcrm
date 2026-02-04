@@ -7,6 +7,12 @@ spring:
     active: dev
   application:
     name: main-training-service
+  activemq:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+    packages:
+      trust-all: true
 management:
   endpoints:
     web:
@@ -15,25 +21,24 @@ management:
   endpoint:
     health:
       show-details: always
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
-
-feign:
-  circuit-breaker:
-    enabled: true
-
-resilience4j:
-  circuit-breaker:
-    instances:
-      workloads-service:
-        registerHealthIndicator: true
-        slidingWindowSize: 10
-        minimumNumberOfCalls: 5
-        permittedNumberOfCallsInHalfOpenState: 3
-        waitDurationInOpenState: 5s
-        failureRateThreshold: 50
-
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/
+#
+#feign:
+#  circuit-breaker:
+#    enabled: true
+#
+#resilience4j:
+#  circuit-breaker:
+#    instances:
+#      workloads-service:
+#        registerHealthIndicator: true
+#        slidingWindowSize: 10
+#        minimumNumberOfCalls: 5
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        waitDurationInOpenState: 5s
+#        failureRateThreshold: 50
 jwt:
   secret: ${JWT_KEY}
