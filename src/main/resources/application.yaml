@@ -4,13 +4,13 @@ server:
     context-path: /api/v1
 spring:
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
     name: main-training-service
   activemq:
-    broker-url: tcp://localhost:61616
-    user: admin
-    password: admin
+    broker-url: tcp://${MQ_HOST:host.docker.internal}:61616
+    user: ${MQ_USER:admin}
+    password: ${MQ_PASSWORD:admin}
     packages:
       trust-all: true
 management:
